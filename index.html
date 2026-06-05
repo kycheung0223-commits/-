@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大華帝國：天命動態弦</title>
+    <title>天命最高</title>
     <style>
         :root {
             --bg-dark: #090b0e;
@@ -19,6 +19,55 @@
         }
         * { box-sizing: border-box; user-select: none; }
         body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+        
+        /* 🎮 導入頁 (Start Screen) 樣式 */
+        .intro-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a2233 0%, #090b0e 100%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .intro-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .intro-subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        .start-btn {
+            background: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 15px 45px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+        .start-btn:hover {
+            background: var(--accent-gold);
+            color: #090b0e;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* 🏛️ 遊戲主畫面樣式 */
         .top-navbar { height: 65px; background: #0b0e14; border-bottom: 2px solid var(--accent-gold); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; }
         .game-main-wrapper { position: absolute; top: 65px; bottom: 140px; left: 0; width: 100%; padding: 20px; display: flex; gap: 20px; }
         .left-panel { width: 340px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
@@ -56,8 +105,17 @@
 </head>
 <body>
 
+    <div id="intro-screen" class="intro-overlay">
+        <div class="intro-title">天命最高</div>
+        <div class="intro-subtitle">
+            「天命無常，唯有德者居之。」<br>
+            你將執掌新創朝代的最高意志。每一次關於選官、稅制、防務與文化的博弈，都將即時重組國家的歷史軌跡。歷史並非線性，開國未必盛世，中衰亦可逆天改命。你，能否承接這萬斤天命？
+        </div>
+        <button class="start-btn" onclick="startGame()">開啟華夏新朝</button>
+    </div>
+
     <div class="top-navbar">
-        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 大華帝國：天命動態興衰（歷史思辨版）</div>
+        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 天命最高：歷史思辨與天命動態弦</div>
         <div style="font-size: 1rem; color: #94a3b8;"><span id="display-years" style="color: #fff;">載入中...</span></div>
     </div>
 
@@ -70,10 +128,10 @@
             <div class="stat-group"><div class="stat-header">📜 文化文治 <span id="val-culture">50</span> <span id="cul-status" style="font-size:0.75rem; color:#ef4444;"></span></div><div class="bar-container"><div id="bar-culture" class="bar-fill fill-cul"></div></div></div>
             <hr style="border:0; border-top:1px solid var(--panel-border); width:100%; margin: 10px 0;">
             <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
-                <b>💡 統治法則變更：</b><br>
-                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或極端胡化）。<br>
+                <b>💡 統治法則：</b><br>
+                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或全盤異化）。<br>
                 2. 政治、經濟、國防任一歸 <b>0</b> 即刻亡國。<br>
-                3. 朝代盛衰由你的選擇實時決定，可能<b>直接步入中衰</b>。
+                3. 朝代盛衰由你的選擇實時決定。
             </div>
         </div>
 
@@ -104,6 +162,12 @@
         let nextModalText = ""; 
         const maxRounds = 25;
         let usedEventIds = new Set();
+
+        // 🎮 進入遊戲按鈕觸發
+        function startGame() {
+            document.getElementById('intro-screen').style.display = 'none';
+            loadTurn();
+        }
 
         function updateUI() {
             document.getElementById('display-years').innerText = `天命紀元 第 ${currentRound} / ${maxRounds} 案`;
@@ -189,7 +253,7 @@
                 activeDisasterEffect = d.effects;
                 
                 let log = document.getElementById('history-log');
-                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈塗炭。</div>` + log.innerHTML;
+                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈湯火。</div>` + log.innerHTML;
             }
         }
 
@@ -264,10 +328,6 @@
                 </div>
             `;
         }
-
-        window.onload = function() {
-            loadTurn();
-        };
     </script>
 </body>
 </html>
