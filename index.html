@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天命最高</title>
+    <title>天命最高：動態歷史思辨系統</title>
     <style>
         :root {
             --bg-dark: #090b0e;
@@ -20,18 +20,17 @@
         * { box-sizing: border-box; user-select: none; }
         body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
         
-        /* 🎮 導入頁 (Start Screen) 樣式 */
-        .intro-overlay {
+        /* 🎬 Flash 風格導入動畫與封面層 */
+        .intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a2233 0%, #090b0e 100%);
+            background: radial-gradient(circle, #1a2230 0%, #05070a 100%);
             z-index: 999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 20px;
+            transition: opacity 1s ease-in-out, visibility 1s;
         }
         .intro-title {
             font-size: 3.5rem;
@@ -40,34 +39,42 @@
             letter-spacing: 8px;
             margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            animation: fadeInDown 1.5s ease-out;
         }
         .intro-subtitle {
             font-size: 1.2rem;
-            color: #94a3b8;
+            color: var(--text-muted);
+            margin-bottom: 50px;
+            letter-spacing: 3px;
             max-width: 600px;
+            text-align: center;
             line-height: 1.8;
-            margin-bottom: 40px;
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 15px;
+            animation: fadeIn 2.5s ease-out;
         }
         .start-btn {
             background: transparent;
             border: 2px solid var(--accent-gold);
             color: var(--accent-gold);
-            padding: 15px 45px;
-            font-size: 1.25rem;
+            padding: 15px 50px;
+            font-size: 1.3rem;
             font-weight: bold;
+            letter-spacing: 5px;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
         }
         .start-btn:hover {
             background: var(--accent-gold);
-            color: #090b0e;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            color: #05070a;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
             transform: scale(1.05);
         }
 
-        /* 🏛️ 遊戲主畫面樣式 */
+        /* 遊戲本體 UI */
         .top-navbar { height: 65px; background: #0b0e14; border-bottom: 2px solid var(--accent-gold); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; }
         .game-main-wrapper { position: absolute; top: 65px; bottom: 140px; left: 0; width: 100%; padding: 20px; display: flex; gap: 20px; }
         .left-panel { width: 340px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
@@ -101,21 +108,28 @@
         .restart-btn { background: transparent; border: 2px solid var(--accent-gold); color: var(--accent-gold); padding: 12px 35px; font-size: 1rem; border-radius: 4px; cursor: pointer; margin-top: 20px; font-weight: bold; }
         
         .disaster-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #f87171; font-size: 0.9rem; line-height: 1.5; }
+
+        /* 動態特效代碼 */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); } 50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); } 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); } }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen" class="intro-overlay">
+    <div id="intro-screen" class="intro-screen">
         <div class="intro-title">天命最高</div>
         <div class="intro-subtitle">
             「天命無常，唯有德者居之。」<br>
-            你將執掌新創朝代的最高意志。每一次關於選官、稅制、防務與文化的博弈，都將即時重組國家的歷史軌跡。歷史並非線性，開國未必盛世，中衰亦可逆天改命。你，能否承接這萬斤天命？
+            歷史的洪流從非死板的直線。朝代治亂興衰、立國是中衰或鼎盛，<br>
+            皆取決於你在政治、經濟、國防與文明天平上的實時博弈。<br>
+            大華帝國的命運，由你落子。
         </div>
-        <button class="start-btn" onclick="startGame()">開啟華夏新朝</button>
+        <button class="start-btn" onclick="startGame()">執掌天命</button>
     </div>
 
     <div class="top-navbar">
-        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 天命最高：歷史思辨與天命動態弦</div>
+        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 天命最高：動態興衰系統（歷史思辨版）</div>
         <div style="font-size: 1rem; color: #94a3b8;"><span id="display-years" style="color: #fff;">載入中...</span></div>
     </div>
 
@@ -129,9 +143,9 @@
             <hr style="border:0; border-top:1px solid var(--panel-border); width:100%; margin: 10px 0;">
             <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
                 <b>💡 統治法則：</b><br>
-                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或全盤異化）。<br>
+                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或全盤胡化）。<br>
                 2. 政治、經濟、國防任一歸 <b>0</b> 即刻亡國。<br>
-                3. 朝代盛衰由你的選擇實時決定。
+                3. 朝代盛衰實時動態分流，考驗你的動態拆彈與維持能力。
             </div>
         </div>
 
@@ -152,7 +166,7 @@
         </div>
     </div>
 
-    <div class="bottom-log-panel"><div class="log-container" id="history-log"><div>📜 [編年史] 諸天先哲垂青，大華基業肇始。</div></div></div>
+    <div class="bottom-log-panel"><div class="log-container" id="history-log"><div>📜 [編年史] 天命既定，大華基業肇始。</div></div></div>
 
     <script src="events.js"></script>
     
@@ -163,10 +177,13 @@
         const maxRounds = 25;
         let usedEventIds = new Set();
 
-        // 🎮 進入遊戲按鈕觸發
+        // 🎬 關閉導入畫面，正式開始遊戲
         function startGame() {
-            document.getElementById('intro-screen').style.display = 'none';
-            loadTurn();
+            const intro = document.getElementById('intro-screen');
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.visibility = 'hidden';
+            }, 1000);
         }
 
         function updateUI() {
@@ -253,7 +270,7 @@
                 activeDisasterEffect = d.effects;
                 
                 let log = document.getElementById('history-log');
-                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈湯火。</div>` + log.innerHTML;
+                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈佇立。</div>` + log.innerHTML;
             }
         }
 
@@ -263,7 +280,7 @@
                 if (status.dead) {
                     return triggerEnd(false, status.title, status.desc);
                 } else {
-                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "<b>恭喜！你成功帶領大華帝國走完了 25 個獨立歷史事件的考驗！</b><br><br>你完美證實了朝代的盛衰並非一條死板的直線，而是由每一個經濟、政治、國防政策疊加後的連動結果。即使你曾中途步入中衰，或者文化幾度歸零，但你依然保住了國家的政權火種！");
+                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "<b>恭喜！你成功帶領國家走完了 25 個獨立歷史事件的考驗，承接住了最高天命！</b><br><br>你完美證實了朝代的盛衰並非一條死板的直線，而是由每一個經濟、政治、國防政策疊加後的連動結果。即使你曾中途步入中衰，或者文化幾度歸零，但你依舊保住了政權火種！");
                 }
             }
 
@@ -311,7 +328,7 @@
         function closeModal() {
             document.getElementById('review-modal').style.display = 'none';
             let log = document.getElementById('history-log');
-            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 政策已定，數值天平已重組。</div>` + log.innerHTML;
+            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 政策已定，天命天平已重組。</div>` + log.innerHTML;
             currentRound++;
             loadTurn();
         }
@@ -328,6 +345,10 @@
                 </div>
             `;
         }
+
+        window.onload = function() {
+            loadTurn();
+        };
     </script>
 </body>
 </html>
