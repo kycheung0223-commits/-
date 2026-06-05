@@ -6,13 +6,13 @@
     <title>天命最高</title>
     <style>
         :root {
-            --bg-dark: #05070a;
-            --stage-bg: #121620;
-            --panel-bg: #1a202c;
-            --panel-border: #344256;
-            --accent-gold: #e2b13c;
-            --text-main: #f1f5f9;
-            --text-muted: #718096;
+            --bg-dark: #0a0705;
+            --stage-bg: #160f0a;
+            --panel-bg: rgba(28, 19, 13, 0.95);
+            --panel-border: #6e4d32;
+            --accent-gold: #f3ca65;
+            --text-main: #f7fafc;
+            --text-muted: #a0aec0;
             --color-pol: #3182ce;
             --color-eco: #38a169;
             --color-def: #e53e3e;
@@ -20,35 +20,42 @@
         }
         * { box-sizing: border-box; user-select: none; }
         
-        /* 🖱️ 5. Flash 專屬滑鼠游標 */
         body { 
             background-color: var(--bg-dark); 
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+                radial-gradient(circle at 50% 30%, #4a2f13 0%, #0a0705 70%);
             color: var(--text-main); 
             font-family: "Microsoft JhengHei", "新細明體", sans-serif; 
             margin: 0; padding: 0; 
             height: 100vh; 
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23e2b13c" stroke="%23000" stroke-width="1.5"><path d="M4.5 3v15.5l4-3.5 3 6.5 2.5-1-3-6.5h5.5z"/></svg>'), auto;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23f3ca65" stroke="%23000" stroke-width="1.5"><path d="M4.5 3v15.5l4-3.5 3 6.5 2.5-1-3-6.5h5.5z"/></svg>'), auto;
         }
         
-        /* 📺 1. Flash 獨立 4:3 舞台外框 */
+        /* 📺 Flash 4:3 朝堂遊戲舞台 */
         .flash-stage {
             width: 1024px;
             height: 768px;
             background-color: var(--stage-bg);
-            border: 8px solid #2d3748;
+            /* 🏯 朝堂背景：強化龍椅背景光暈與廊柱陰影 */
+            background-image: 
+                linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(22, 15, 10, 0.6) 100%),
+                radial-gradient(circle at 50% 25%, rgba(243, 202, 101, 0.18) 0%, transparent 60%),
+                linear-gradient(90deg, #0f0a06 0%, transparent 10%, transparent 90%, #0f0a06 100%);
+            border: 6px solid #4a3321;
             border-radius: 4px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(226, 177, 60, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(243, 202, 101, 0.15);
             position: relative;
             overflow: hidden;
         }
 
-        /* ⏳ 5. 懷舊 Loading 載入進度條畫面 */
+        /* ⏳ Loading 載入進度條 */
         .loading-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #090b10;
+            background: #090604;
             z-index: 1000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
@@ -63,81 +70,137 @@
             width: 0%; height: 100%; background: var(--accent-gold); transition: width 0.05s linear;
         }
 
-        /* 🎬 Flash 導入片頭 */
+        /* 🎬 開頭畫面 */
         .intro-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a2436 0%, #090c12 100%);
+            background: radial-gradient(circle at 50% 40%, #2c1a0e 0%, #090604 100%);
             z-index: 999;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
         .intro-title {
-            font-size: 4rem; font-weight: 900; color: var(--accent-gold);
-            letter-spacing: 12px; margin-bottom: 25px;
-            text-shadow: 3px 3px 0px #000, 0 0 25px rgba(226, 177, 60, 0.5);
+            font-size: 4.5rem; font-weight: 900; color: var(--accent-gold);
+            letter-spacing: 15px; margin-bottom: 25px;
+            text-shadow: 3px 3px 0px #000, 0 0 30px rgba(243, 202, 101, 0.6);
             animation: flashZoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .intro-subtitle {
-            font-size: 1.15rem; color: #a0aec0; margin-bottom: 60px;
-            letter-spacing: 2px; max-width: 650px; text-align: center; line-height: 1.9;
+            font-size: 1.15rem; color: #cbd5e0; margin-bottom: 60px;
+            letter-spacing: 2px; max-width: 650px; text-align: center; line-height: 2;
             text-shadow: 1px 1px 2px #000;
         }
         .start-btn {
-            background: #2d3748; border: 3px solid var(--accent-gold); color: var(--accent-gold);
+            background: #4a3321; border: 3px solid var(--accent-gold); color: var(--accent-gold);
             padding: 14px 60px; font-size: 1.4rem; font-weight: bold; letter-spacing: 6px;
-            border-radius: 6px; cursor: pointer; text-shadow: 1px 1px 1px #000;
-            box-shadow: 0 6px 0 #1a202c, 0 10px 20px rgba(0,0,0,0.5);
+            border-radius: 4px; cursor: pointer; text-shadow: 1px 1px 1px #000;
+            box-shadow: 0 6px 0 #1f140c, 0 10px 20px rgba(0,0,0,0.6);
             transition: transform 0.1s;
         }
-        .start-btn:hover { background: #3a475c; transform: translateY(-2px); }
-        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a202c; }
+        .start-btn:hover { background: #5c402a; transform: translateY(-2px); }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1f140c; }
 
-        /* 遊戲核心介面 UI */
-        .top-navbar { height: 60px; background: #0b0e14; border-bottom: 3px solid var(--accent-gold); padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
-        .game-main-wrapper { position: absolute; top: 60px; bottom: 130px; left: 0; width: 100%; padding: 15px; display: flex; gap: 15px; }
-        .left-panel { width: 320px; background: var(--panel-bg); border: 2px solid var(--panel-border); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .right-panel { flex: 1; background: var(--panel-bg); border: 2px solid var(--panel-border); padding: 20px; overflow-y: auto; position: relative; }
+        /* 👑 頂部導覽列 */
+        .top-navbar { height: 55px; background: #0f0a06; border-bottom: 3px solid var(--accent-gold); padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 📊 3. 數值跳動感進度條 */
-        .stat-group { margin-bottom: 2px; }
-        .stat-header { font-size: 0.95rem; margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; text-shadow: 1px 1px 1px #000; }
-        .bar-container { background: #000; height: 18px; border: 1px solid #4a5568; pading: 1px; }
-        .bar-fill { height: 100%; width: 50%; transition: width 0.15s cubic-bezier(0.1, 0.8, 0.1, 1); } /* 加快變動速度營造閃爍硬直感 */
-        .fill-pol { background-color: var(--color-pol); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
-        .fill-eco { background-color: var(--color-eco); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
-        .fill-def { background-color: var(--color-def); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
-        .fill-cul { background-color: var(--color-cul); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
-        
-        .era-tag { display: inline-block; padding: 4px 10px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; border: 2px solid var(--accent-gold); background: #000; color: var(--accent-gold); }
+        /* 🏯 遊戲主舞台版面（上資源、下核心） */
+        .game-main-wrapper { 
+            position: absolute; top: 55px; bottom: 130px; left: 0; width: 100%; 
+            padding: 15px; display: flex; flex-direction: column; gap: 15px; 
+        }
 
-        .event-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; color: #fff; text-shadow: 1px 1px 2px #000; }
-        .event-desc { font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; background: #0b0f17; padding: 15px; border: 1px dashed var(--panel-border); margin-bottom: 15px; }
+        /* 📊 2. 「國力」橫向狀態列（更像遊戲資源欄） */
+        .stats-top-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            background: rgba(15, 10, 6, 0.9);
+            border: 2px solid var(--panel-border);
+            padding: 12px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+        .stat-group { display: flex; flex-direction: column; gap: 4px; }
+        .stat-header { font-size: 0.9rem; font-weight: bold; display: flex; justify-content: space-between; text-shadow: 1px 1px 1px #000; }
+        .bar-container { background: #000; height: 14px; border: 1px solid #5c4028; padding: 1px; border-radius: 2px; }
+        .bar-fill { height: 100%; width: 50%; transition: width 0.15s cubic-bezier(0.1, 0.8, 0.1, 1); }
+        .fill-pol { background-color: var(--color-pol); box-shadow: inset 0 0 5px rgba(255,255,255,0.4); }
+        .fill-eco { background-color: var(--color-eco); box-shadow: inset 0 0 5px rgba(255,255,255,0.4); }
+        .fill-def { background-color: var(--color-def); box-shadow: inset 0 0 5px rgba(255,255,255,0.4); }
+        .fill-cul { background-color: var(--color-cul); box-shadow: inset 0 0 5px rgba(255,255,255,0.4); }
+
+        /* 🏛️ 3. 中央朝堂核心決策區 */
+        .court-center-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 4px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* 👑 3. 畫面正中央上方：天子龍椅浮雕裝飾 */
+        .court-emperor-seal {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            letter-spacing: 6px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(243, 202, 101, 0.5);
+            border-bottom: 1px solid rgba(110, 77, 50, 0.4);
+            padding-bottom: 8px;
+        }
+
+        .era-tag { display: inline-block; padding: 4px 12px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; border: 2px solid var(--accent-gold); background: #000; color: var(--accent-gold); align-self: flex-start; }
+        .event-title { font-size: 1.35rem; font-weight: bold; margin-bottom: 10px; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .event-desc { font-size: 0.95rem; line-height: 1.7; color: #f0e6df; background: rgba(0, 0, 0, 0.5); padding: 15px; border: 1px dashed var(--panel-border); margin-bottom: 20px; border-radius: 4px; }
         
-        /* 🎴 朝臣卡片（經典 Flash 按鈕反饋） */
-        .advisor-card { background: #232d3f; border: 2px solid #3a4a63; padding: 14px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 0 #0f141c; }
-        .advisor-card:hover { border-color: var(--accent-gold); background: #2c394f; transform: translateY(-2px); box-shadow: 0 6px 0 #0f141c; }
-        .advisor-card:active { transform: translateY(3px); box-shadow: 0 1px 0 #0f141c; }
-        .advisor-name { font-size: 1rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 4px; }
+        /* 🎴 朝臣奏折卡片區（橫向並排，更有對立博弈感） */
+        .advisors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .advisor-card { 
+            background: linear-gradient(to bottom, #2d1f14, #21160e); 
+            border: 2px solid #5c4028; 
+            padding: 16px; 
+            border-radius: 4px;
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #120c08, 0 4px 10px rgba(0,0,0,0.3); 
+            transition: all 0.1s;
+        }
+        .advisor-card:hover { 
+            border-color: var(--accent-gold); 
+            background: linear-gradient(to bottom, #3a291a, #2a1c12); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 0 #120c08, 0 0 15px rgba(243, 202, 101, 0.2); 
+        }
+        .advisor-card:active { transform: translateY(3px); box-shadow: 0 1px 0 #120c08; }
+        .advisor-name { font-size: 1.05rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 6px; text-shadow: 1px 1px 1px #000; }
         
-        /* 📜 3. 太史公秘卷彈簧跳出特效 */
-        .review-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; align-items: center; }
-        .modal-content { max-width: 650px; background: #1a2230; border: 3px solid var(--accent-gold); padding: 25px; box-shadow: 0 0 30px #000; animation: flashPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* 📜 太史公秘卷彈窗 */
+        .review-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; align-items: center; }
+        .modal-content { max-width: 650px; background: #1f140c; border: 3px solid var(--accent-gold); padding: 25px; box-shadow: 0 0 30px #000; animation: flashPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-title { font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 15px; border-bottom: 2px dashed var(--panel-border); padding-bottom: 10px; }
-        .modal-text { font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 20px; }
+        .modal-text { font-size: 0.95rem; line-height: 1.7; color: #f0e6df; margin-bottom: 20px; }
         .modal-btn { background: var(--accent-gold); color: #000; border: 2px solid #fff; padding: 10px 25px; font-size: 1rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #977117; }
         .modal-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #977117; }
 
-        .bottom-log-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 130px; background: #0b0e14; border-top: 2px solid var(--panel-border); padding: 12px 25px; }
-        .log-container { height: 100%; overflow-y: auto; font-size: 0.85rem; color: #718096; line-height: 1.7; font-family: monospace; }
+        /* 📜 底部編年史日誌 */
+        .bottom-log-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 130px; background: #0b0705; border-top: 2px solid var(--panel-border); padding: 12px 25px; }
+        .log-container { height: 100%; overflow-y: auto; font-size: 0.85rem; color: #a0aec0; line-height: 1.7; font-family: monospace; }
         .restart-btn { background: #e53e3e; border: 2px solid #fff; color: #fff; padding: 10px 30px; font-size: 1rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #9b2c2c; }
         .restart-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #9b2c2c; }
         
-        .disaster-alert { background: #2d1c1c; border: 2px solid #e53e3e; padding: 10px; margin-bottom: 12px; color: #fc8181; font-size: 0.88rem; animation: blink 1s infinite alternate; }
+        .disaster-alert { background: #3d1313; border: 2px solid #e53e3e; padding: 10px; margin-bottom: 12px; color: #fc8181; font-size: 0.88rem; animation: blink 1s infinite alternate; }
 
-        /* 🎬 Flash 靈魂經典動畫 */
         @keyframes flashZoomIn { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes flashPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes blink { from { border-color: #e53e3e; } to { border-color: #742a2a; } }
+        @keyframes blink { from { border-color: #e53e3e; } to { border-color: #5c1d1d; } }
     </style>
 </head>
 <body>
@@ -168,22 +231,18 @@
         </div>
 
         <div class="game-main-wrapper">
-            <div class="left-panel">
-                <div style="color:var(--text-muted); font-size:0.85rem; border-bottom:2px solid var(--panel-border); padding-bottom:5px; font-weight: bold; text-align: center;">帝國四大核心國力</div>
+            
+            <div class="stats-top-bar">
                 <div class="stat-group"><div class="stat-header">🏛️ 政治清明 <span id="val-politics">50</span></div><div class="bar-container"><div id="bar-politics" class="bar-fill fill-pol"></div></div></div>
                 <div class="stat-group"><div class="stat-header">💰 經濟生產 <span id="val-economy">50</span></div><div class="bar-container"><div id="bar-economy" class="bar-fill fill-eco"></div></div></div>
                 <div class="stat-group"><div class="stat-header">⚔️ 國防軍武 <span id="val-defense">50</span></div><div class="bar-container"><div id="bar-defense" class="bar-fill fill-def"></div></div></div>
                 <div class="stat-group"><div class="stat-header">📜 文化文治 <span id="val-culture">50</span> <span id="cul-status" style="font-size:0.75rem; color:#f56565;"></span></div><div class="bar-container"><div id="bar-culture" class="bar-fill fill-cul"></div></div></div>
-                <hr style="border:0; border-top:2px dashed var(--panel-border); width:100%; margin: 8px 0;">
-                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6; background: #0b0e14; padding: 8px; border: 1px solid #2d3748;">
-                    <b>💡 統治法則：</b><br>
-                    1. 文化歸 0 不會亡國。<br>
-                    2. 政治、經濟、國防任一歸 0 即刻亡國。<br>
-                    3. 朝代盛衰實時動態分流。
-                </div>
             </div>
 
-            <div class="right-panel" id="action-zone">
+            <div class="court-center-zone" id="action-zone">
+                
+                <div class="court-emperor-seal">⚜️ 大華帝國 · 奉天承運 ⚜️</div>
+
                 <div id="review-modal" class="review-modal">
                     <div class="modal-content">
                         <div class="modal-title" id="modal-title">📜 太史公秘卷 · 三朝策論鏡鑑</div>
@@ -196,7 +255,8 @@
                 <span id="state-badge" class="era-tag">當前國勢：動態計算中</span>
                 <div id="event-title" class="event-title">載入中...</div>
                 <div id="event-desc" class="event-desc">載入中...</div>
-                <div id="advisors-group"></div>
+                
+                <div id="advisors-group" class="advisors-grid"></div>
             </div>
         </div>
 
@@ -204,110 +264,127 @@
 
     </div>
 
-    <script src="events.js"></script>
-    
     <script>
-        // 🎵 2. 免外部下載的 Flash 蜂鳴音效系統 (Web Audio API)
+        // 內建完整事件池與天災資料
+        const gameEvents = [
+            {
+                id: 1, tags: ["開國"], title: "案一：論開國法統與宗廟之制", description: "帝國初建，百廢待興。群臣為確立新朝法統，對如何祭祀前朝皇帝與立本朝宗廟爭論不休。這關乎新政權的「正統性」與天下讀書人的歸心程度。",
+                advisors: [
+                    { name: "禮部尚書 · 獨孤信", quote: "「當上承漢唐大統，尊前朝先帝為客，廣修文廟，宣揚我朝因循天命。」", effects: { politics: 15, culture: 15, economy: -5 }, historicalNote: "<b>歷史鏡鑑：</b>此決策類似<b>漢高祖劉邦</b>立國初期因循秦制但廣納儒生，或<b>清初多爾袞</b>為明崇禎帝發喪，迅速安撫了前朝遺民與士大夫階層，使政治與文化迅速穩定，但維護禮制耗費了不少公帑。" },
+                    { name: "開國勛貴 · 擴廓帖木兒", quote: "「新朝當文武分明！前朝乃亡國之君，何須尊奉？應即刻拆毀舊廟，沒收其田產充實國庫，重賞有功將士！」", effects: { defense: 15, economy: 15, politics: -10, culture: -15 }, historicalNote: "<b>歷史鏡鑑：</b>此舉重現了<b>明太祖朱元璋</b>立國之初強烈排斥元朝遺風、或<b>北魏太武帝</b>激進改制的作風。雖能快速獲得武將集團支持並充實財政，卻極易引發文化斷代與前朝舊勢力的反撲。" }
+                ]
+            },
+            {
+                id: 2, tags: ["開國"], title: "案二：功臣封賞與分封之選", description: "天下初定，跟隨陛下打江山的宿將功臣們正屏息以待。部分將領私下議論，希望比照周朝分封諸侯，割據一方；而法家文臣則極力反對，認為分封必致戰亂。",
+                advisors: [
+                    { name: "👑 丞相 · 蕭何", quote: "「分封乃亂朝之始。當盡推郡縣之制，將功臣遷至京師授以虛銜，分發金帛優賞，收回兵權。」", effects: { politics: 20, economy: -10, defense: -10 }, historicalNote: "<b>歷史鏡鑑：</b>此策即為<b>宋太祖趙匡胤「杯酒釋兵權」</b>與<b>漢高祖剷除異姓王</b>的揉合。高度中央集權保證了政治清明，但削弱地方武備、大量圈養功臣，亦會加重財政負擔與國防虛弱。" },
+                    { name: "⚔️ 御史大夫 · 周勃", quote: "「山高皇帝遠，邊疆蠻夷未服。若不分封功臣宿將鎮守各方，一旦中央有變，誰來勤王？當裂土分封，拱衛中央！」", effects: { defense: 20, culture: 5, politics: -15, economy: -5 }, historicalNote: "<b>歷史鏡鑑：</b>這正是<b>西漢初年郡國並行制</b>與<b>明初朱元璋分封諸王</b>的翻版。短期內各王鎮守邊疆，國防大增；但數十年後必然引發<b>吳楚七國之亂</b>或<b>明朝靖難之役</b>，嚴重削弱中央政治。" }
+                ]
+            },
+            {
+                id: 3, tags: ["守成"], title: "案三：江南茶鹽專賣官營議", description: "帝國步入守成期，開支漸大。戶部上奏，南方私茶與私鹽氾濫，國家稅收大量流失。建議朝廷將茶、鹽全面收歸官營，嚴禁民間私販，違者處死。",
+                advisors: [
+                    { name: "💰 戶部尚書 · 桑弘羊", quote: "「山海之利，朝廷當總攬之。茶鹽專賣，國庫可年增千萬貫，用以支持邊防，此乃利國之舉。」", effects: { economy: 25, defense: 10, politics: -10, culture: -5 }, historicalNote: "<b>歷史鏡鑑：</b>此法源於<b>漢武帝之鹽鐵官營</b>與<b>唐代第五琦的鹽法改革</b>。雖能瞬間讓朝廷財政暴增、支持軍隊，但代價是官吏貪腐（政治下降）、民間怨聲載道，甚至逼農民走向走私犯罪。" },
+                    { name: "📜 儒家大儒 · 董仲舒", quote: "「朝廷豈可與民爭利？官營茶鹽，商賈失業，百姓吃貴鹽。當藏富於民，開放民營，僅課徵少許商稅即可。」", effects: { politics: 15, culture: 15, economy: -15 }, historicalNote: "<b>歷史鏡鑑：</b>這重現了漢代<b>《鹽鐵論》</b>中賢良文學的觀點。開放民營能贏得極高的民心與儒家文治聲望，大受文人讚賞，但國家財政將陷入拮据，一旦邊境有事，朝廷將無力發餉。" }
+                ]
+            },
+            {
+                id: 4, tags: ["鼎盛"], title: "案四：西域都護府與萬邦來朝", description: "帝國國力達到鼎盛，西域諸國派遣使節前來長安，願意奉陛下為「天可汗」。但代價是朝廷必須設立西域都護府提供庇護，並每年賜予巨額賞賜（厚往薄來）。",
+                advisors: [
+                    { name: "🗺️ 鴻胪寺卿 · 班超", quote: "「此乃宣揚大國威儀、建立朝貢體系之良機！設都護府可斷匈奴右臂，萬邦文治稱頌萬世！」", effects: { culture: 25, defense: 15, economy: -20 }, historicalNote: "<b>歷史鏡鑑：</b>此為<b>唐太宗貞觀之治</b>與<b>明成祖鄭和下西洋</b>的朝貢外交。極大地擴張了文明影響力與國防戰略深度，但「厚往薄來」的賞賜對國家經濟是一場無底洞般的財政消耗。" },
+                    { name: "⚖️ 魏國公 · 魏徵", quote: "「虛名誤國啊！西域荒涼，得其地不可耕，得其民不可臣。將中原血汗錢去補貼蠻夷，實乃本末倒置。請婉拒其求，閉關自守。」", effects: { economy: 15, politics: 10, culture: -15, defense: -10 }, historicalNote: "<b>歷史鏡鑑：</b>這符合<b>漢元帝時期罷珠崖郡</b>、或是明代中葉後內斂守成的思維。保全了國內經濟與政治基本盤，但代價是放棄了地緣政治主導權，文化影響力銳減。" }
+                ]
+            },
+            {
+                id: 5, tags: ["中衰"], title: "案五：流民揭竿與均田清丈議", description: "因連年天災與兼併，北方出現大量失去土地的流民，甚至有黃巾、白蓮等秘密宗教在地方串聯。朝廷正臨危局，必須立刻決定如何處置。",
+                advisors: [
+                    { name: "🔥 兵部尚書 · 盧象昇", quote: "「刁民聚眾即是賊！若不以雷霆手段鎮壓，必成星火燎原之勢。應即刻調動邊防精銳，進剿叛軍！」", effects: { defense: 15, politics: 5, economy: -15, culture: -10 }, historicalNote: "<b>歷史鏡鑑：</b>這重現了<b>明末鎮壓李自成、張獻忠</b>的策略。軍隊能快速撲滅地表上的反抗，但嚴酷的鎮壓會徹底摧毀地方經濟，且「按下葫蘆起了瓢」，無法根治流民問題。" },
+                    { name: "🌾 內閣大學士 · 張居正", quote: "「治標不如治本。流民皆因無田可耕。當推行『一條鞭法』並丈量天下田產，將豪強隱瞞的土地分給流民，減免賦稅。」", effects: { economy: 20, politics: 15, culture: 10, defense: -25 }, historicalNote: "<b>歷史鏡鑑：</b>此為<b>明代張居正改革</b>與<b>北魏孝文帝均田制</b>。從根本上修補了經濟與民生，但清丈田產嚴重侵犯了武將勛貴與地方豪強的利益，導致國防與兵權階層極度不滿，容易引發軍事政變。" }
+                ]
+            }
+        ];
+
+        const randomDisasters = [
+            { name: "黃河大決堤", desc: "歲末天降暴雨，黃河於汴梁決口，淹沒數百里大田，飢民百萬。", effects: { economy: -15, politics: -5, defense: 0 } },
+            { name: "漠北白災（大寒潮）", desc: "遭遇百年一遇大寒冬，北方牲畜凍死大半，游牧鐵騎為了生存瘋狂南下寇邊。", effects: { defense: -15, economy: -5, politics: 0 } },
+            { name: "九品官場舞弊案", desc: "科舉主考官公然販賣試題，權貴子弟包攬中舉，天下寒門學子罷考遊行。", effects: { politics: -15, culture: -10, defense: 0 } }
+        ];
+
+        // 模擬 Flash 點陣音效系統
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playFlashSound(type) {
             try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
+                osc.connect(gain); gain.connect(audioCtx.destination);
                 if (type === 'hover') {
                     osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
                     osc.start(); osc.stop(audioCtx.currentTime + 0.04);
                 } else if (type === 'click') {
-                    osc.type = 'square'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    osc.type = 'square'; osc.frequency.setValueAtTime(550, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
                     osc.start(); osc.stop(audioCtx.currentTime + 0.08);
                 } else if (type === 'disaster') {
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                    osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.4);
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
                     osc.start(); osc.stop(audioCtx.currentTime + 0.4);
                 } else if (type === 'complete') {
-                    osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
                 }
             } catch(e) {}
         }
 
         let stats = { politics: 50, economy: 50, defense: 50, culture: 50 };
-        let currentRound = 1;
-        let nextModalText = ""; 
-        const maxRounds = 25;
+        let currentRound = 1; let nextModalText = ""; const maxRounds = 15;
         let usedEventIds = new Set();
 
-        // ⏳ 5. 模擬 Flash 經典的 Loading 載入進度條
         function runSimulatedLoading() {
-            let progress = 0;
-            const fill = document.getElementById('loading-bar-fill');
-            const text = document.getElementById('loading-text');
-            
+            let progress = 0; const fill = document.getElementById('loading-bar-fill'); const text = document.getElementById('loading-text');
             const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 8) + 2;
+                progress += Math.floor(Math.random() * 12) + 4;
                 if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    fill.style.width = '100%';
-                    text.innerText = "🎬 LOAD COMPLETE!";
+                    progress = 100; clearInterval(interval);
+                    fill.style.width = '100%'; text.innerText = "🎬 LOAD COMPLETE!";
                     playFlashSound('complete');
-                    
-                    // 1秒後切換到封面
                     setTimeout(() => {
                         document.getElementById('loading-screen').style.display = 'none';
                         document.getElementById('intro-screen').style.display = 'flex';
-                    }, 800);
+                    }, 600);
                 } else {
-                    fill.style.width = progress + '%';
-                    text.innerText = `NOW LOADING... ${progress}%`;
+                    fill.style.width = progress + '%'; text.innerText = `NOW LOADING... ${progress}%`;
                     if (progress % 20 === 0) playFlashSound('hover');
                 }
-            }, 60);
+            }, 50);
         }
 
-        // 🎬 關閉導入畫面，正式開始遊戲
         function startGame() {
             playFlashSound('click');
-            const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0';
-            setTimeout(() => {
-                intro.style.visibility = 'hidden';
-            }, 500);
+            document.getElementById('intro-screen').style.opacity = '0';
+            setTimeout(() => { document.getElementById('intro-screen').style.display = 'none'; }, 500);
         }
 
         function updateUI() {
             document.getElementById('display-years').innerText = `ROUND: ${currentRound} / ${maxRounds}`;
-            
             ["politics", "economy", "defense", "culture"].forEach(s => {
                 stats[s] = Math.min(100, Math.max(0, stats[s]));
                 document.getElementById(`val-${s}`).innerText = stats[s];
                 document.getElementById(`bar-${s}`).style.width = stats[s] + '%';
             });
 
-            if (stats.culture <= 0) {
-                document.getElementById('cul-status').innerText = "(文明斷代)";
-            } else {
-                document.getElementById('cul-status').innerText = "";
-            }
+            if (stats.culture <= 0) document.getElementById('cul-status').innerText = "(斷代)";
+            else document.getElementById('cul-status').innerText = "";
 
             let totalPower = stats.politics + stats.economy + stats.defense;
             let badge = document.getElementById('state-badge');
-            if (currentRound === 1) {
-                badge.innerText = "🌱 新朝立國奠基";
-            } else if (totalPower >= 180) {
-                badge.innerText = "☀️ 盛世景象：鼎盛擴張";
-            } else if (totalPower >= 110) {
-                badge.innerText = "⚖️ 平穩守成";
-            } else {
-                badge.innerText = "⚡ 帝國中衰";
-            }
+            if (currentRound === 1) badge.innerText = "🌱 新朝立國奠基";
+            else if (totalPower >= 180) badge.innerText = "☀️ 盛世景象：鼎盛擴張";
+            else if (totalPower >= 110) badge.innerText = "⚖️ 平穩守成";
+            else badge.innerText = "⚡ 帝國中衰";
         }
 
         function checkGameOver() {
@@ -319,110 +396,81 @@
         }
 
         function pullNextEvent() {
-            let totalPower = stats.politics + stats.economy + stats.defense;
-            let pool = [];
-
-            if (currentRound <= 3) {
-                pool = gameEvents.filter(e => e.tags.includes("開國"));
-            } else if (totalPower >= 180) {
-                pool = gameEvents.filter(e => e.tags.includes("鼎盛"));
-            } else if (totalPower >= 110) {
-                pool = gameEvents.filter(e => e.tags.includes("守成"));
-            } else {
-                pool = gameEvents.filter(e => e.tags.includes("中衰"));
-            }
+            let totalPower = stats.politics + stats.economy + stats.defense; let pool = [];
+            if (currentRound <= 2) pool = gameEvents.filter(e => e.tags.includes("開國"));
+            else if (totalPower >= 180) pool = gameEvents.filter(e => e.tags.includes("鼎盛"));
+            else if (totalPower >= 110) pool = gameEvents.filter(e => e.tags.includes("守成"));
+            else pool = gameEvents.filter(e => e.tags.includes("中衰"));
 
             let available = pool.filter(e => !usedEventIds.has(e.id));
             if (available.length === 0) available = gameEvents.filter(e => !usedEventIds.has(e.id));
             if (available.length === 0) return null;
             
             let chosen = available[Math.floor(Math.random() * available.length)];
-            usedEventIds.add(chosen.id);
-            return chosen;
+            usedEventIds.add(chosen.id); return chosen;
         }
 
         let activeDisasterEffect = null;
         function tryTriggerDisaster() {
-            let container = document.getElementById('disaster-zone');
-            container.innerHTML = "";
-            activeDisasterEffect = null;
-
-            if (currentRound > 1 && Math.random() < 0.25) {
+            let container = document.getElementById('disaster-zone'); container.innerHTML = ""; activeDisasterEffect = null;
+            if (currentRound > 1 && Math.random() < 0.3) {
                 playFlashSound('disaster');
                 let d = randomDisasters[Math.floor(Math.random() * randomDisasters.length)];
                 container.innerHTML = `
                     <div class="disaster-alert">
                         <b>⚠️ 突發天災：【${d.name}】</b><br>
-                        ${d.desc} (強制扣減：政治${d.effects.politics || 0}，經濟${d.effects.economy || 0}，國防${d.effects.defense || 0})
+                        ${d.desc} (強制扣減：政治${d.effects.politics||0}，經濟${d.effects.economy||0}，國防${d.effects.defense||0})
                     </div>
                 `;
                 activeDisasterEffect = d.effects;
-                
                 let log = document.getElementById('history-log');
-                log.innerHTML = `<div style="color:#f56565;">⚡ [天災] 遭遇 ${d.name}。</div>` + log.innerHTML;
+                log.innerHTML = `<div style="color:#fc8181;">⚡ [天災] 國內遭遇 ${d.name}。</div>` + log.innerHTML;
             }
         }
 
         function loadTurn() {
             let status = checkGameOver();
             if (status) {
-                if (status.dead) {
-                    return triggerEnd(false, status.title, status.desc);
-                } else {
-                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "恭喜！你成功帶領國家走完了 25 個獨立歷史事件的考驗，承接住了最高天命！");
-                }
+                if (status.dead) return triggerEnd(false, status.title, status.desc);
+                else return triggerEnd(true, "🏆 天命長青 · 朝代功成通關", "<b>恭喜！你成功帶領國家走完了所有歷史考驗，承接住了最高天命！</b><br><br>帝國基業已穩，你的歷史決策將被載入史冊！");
             }
 
-            updateUI();
-            tryTriggerDisaster();
-
+            updateUI(); tryTriggerDisaster();
             let activeEvent = pullNextEvent();
-            if (!activeEvent) return triggerEnd(true, "🏆 通關", "所有事件池已演繹完畢！");
+            if (!activeEvent) return triggerEnd(true, "🏆 通關", "天命已定，國家平穩落地！");
 
             document.getElementById('event-title').innerText = activeEvent.title;
             document.getElementById('event-desc').innerText = activeEvent.description;
 
-            let box = document.getElementById('advisors-group');
-            box.innerHTML = '';
+            let box = document.getElementById('advisors-group'); box.innerHTML = '';
             activeEvent.advisors.forEach(a => {
-                let card = document.createElement('div');
-                card.className = 'advisor-card';
-                card.innerHTML = `<div class="advisor-name">${a.name}</div><div style="font-style:italic; color:#a0aec0; font-size:0.88rem;">「${a.quote}」</div>`;
-                
-                // 🔊 音效綁定
+                let card = document.createElement('div'); card.className = 'advisor-card';
+                card.innerHTML = `<div class="advisor-name">${a.name}</div><div style="font-style:italic; color:#e2e8f0; font-size:0.88rem;">「${a.quote}」</div>`;
                 card.onmouseenter = () => playFlashSound('hover');
                 card.onclick = () => {
-                    playFlashSound('click');
-                    nextModalText = a.historicalNote;
-                    applyEffects(a.effects);
+                    playFlashSound('click'); nextModalText = a.historicalNote; applyEffects(a.effects);
                 };
                 box.appendChild(card);
             });
         }
 
         function applyEffects(eff) {
-            stats.politics += (eff.politics || 0);
-            stats.economy += (eff.economy || 0);
-            stats.defense += (eff.defense || 0);
-            stats.culture += (eff.culture || 0);
-
+            stats.politics += (eff.politics || 0); stats.economy += (eff.economy || 0);
+            stats.defense += (eff.defense || 0); stats.culture += (eff.culture || 0);
             if (activeDisasterEffect) {
                 stats.politics += (activeDisasterEffect.politics || 0);
                 stats.economy += (activeDisasterEffect.economy || 0);
                 stats.defense += (activeDisasterEffect.defense || 0);
             }
-
             document.getElementById('modal-text').innerHTML = nextModalText;
             document.getElementById('review-modal').style.display = 'flex';
         }
 
         function closeModal() {
-            playFlashSound('click');
-            document.getElementById('review-modal').style.display = 'none';
+            playFlashSound('click'); document.getElementById('review-modal').style.display = 'none';
             let log = document.getElementById('history-log');
-            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 天命天平已重組。</div>` + log.innerHTML;
-            currentRound++;
-            loadTurn();
+            log.innerHTML = `<div>✍️ [ROUND ${currentRound} 結算] 政策已定，天命重組。</div>` + log.innerHTML;
+            currentRound++; loadTurn();
         }
 
         function triggerEnd(isVictory, title, text) {
@@ -431,7 +479,7 @@
             zone.innerHTML = `
                 <div style="text-align:center; padding: 20px 0;">
                     <h2 style="color:var(--accent-gold); font-size: 1.6rem; margin-bottom:15px; text-shadow:1px 1px 0 #000;">${title}</h2>
-                    <div style="background: #0b0e14; border: 2px dashed var(--panel-border); padding: 20px; text-align: left; line-height: 1.8; margin-bottom:25px; font-size:0.95rem;">
+                    <div style="background: #0f0a06; border: 2px dashed var(--panel-border); padding: 20px; text-align: left; line-height: 1.8; margin-bottom:25px; font-size:0.95rem;">
                         ${text}
                     </div>
                     <button class="restart-btn" onclick="location.reload()">重新推演天命</button>
@@ -439,9 +487,7 @@
             `;
         }
 
-        window.onload = function() {
-            runSimulatedLoading();
-        };
+        window.onload = function() { runSimulatedLoading(); loadTurn(); };
     </script>
 </body>
 </html>
