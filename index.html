@@ -3,191 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天命最高：動態歷史思辨系統</title>
+    <title>天命最高</title>
     <style>
         :root {
-            --bg-dark: #090b0e;
-            --panel-bg: #121620;
-            --panel-border: #242c3d;
-            --accent-gold: #d4af37;
+            --bg-dark: #05070a;
+            --stage-bg: #121620;
+            --panel-bg: #1a202c;
+            --panel-border: #344256;
+            --accent-gold: #e2b13c;
             --text-main: #f1f5f9;
-            --text-muted: #64748b;
-            --color-pol: #3b82f6;
-            --color-eco: #10b981;
-            --color-def: #ef4444;
-            --color-cul: #8b5cf6;
+            --text-muted: #718096;
+            --color-pol: #3182ce;
+            --color-eco: #38a169;
+            --color-def: #e53e3e;
+            --color-cul: #805ad5;
         }
         * { box-sizing: border-box; user-select: none; }
-        body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
         
-        /* 🎬 Flash 風格導入動畫與封面層 */
-        .intro-screen {
-            position: fixed;
+        /* 🖱️ 5. Flash 專屬滑鼠游標 */
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: "Microsoft JhengHei", "新細明體", sans-serif; 
+            margin: 0; padding: 0; 
+            height: 100vh; 
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23e2b13c" stroke="%23000" stroke-width="1.5"><path d="M4.5 3v15.5l4-3.5 3 6.5 2.5-1-3-6.5h5.5z"/></svg>'), auto;
+        }
+        
+        /* 📺 1. Flash 獨立 4:3 舞台外框 */
+        .flash-stage {
+            width: 1024px;
+            height: 768px;
+            background-color: var(--stage-bg);
+            border: 8px solid #2d3748;
+            border-radius: 4px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(226, 177, 60, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ⏳ 5. 懷舊 Loading 載入進度條畫面 */
+        .loading-screen {
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a2230 0%, #05070a 100%);
+            background: #090b10;
+            z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .loading-text {
+            font-family: monospace; font-size: 1.2rem; color: var(--accent-gold);
+            margin-bottom: 15px; letter-spacing: 2px; font-weight: bold;
+        }
+        .loading-bar-border {
+            width: 300px; height: 12px; border: 2px solid var(--accent-gold); padding: 2px; border-radius: 2px;
+        }
+        .loading-bar-fill {
+            width: 0%; height: 100%; background: var(--accent-gold); transition: width 0.05s linear;
+        }
+
+        /* 🎬 Flash 導入片頭 */
+        .intro-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a2436 0%, #090c12 100%);
             z-index: 999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1s ease-in-out, visibility 1s;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
         }
         .intro-title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-            animation: fadeInDown 1.5s ease-out;
+            font-size: 4rem; font-weight: 900; color: var(--accent-gold);
+            letter-spacing: 12px; margin-bottom: 25px;
+            text-shadow: 3px 3px 0px #000, 0 0 25px rgba(226, 177, 60, 0.5);
+            animation: flashZoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .intro-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-bottom: 50px;
-            letter-spacing: 3px;
-            max-width: 600px;
-            text-align: center;
-            line-height: 1.8;
-            border-left: 3px solid var(--accent-gold);
-            padding-left: 15px;
-            animation: fadeIn 2.5s ease-out;
+            font-size: 1.15rem; color: #a0aec0; margin-bottom: 60px;
+            letter-spacing: 2px; max-width: 650px; text-align: center; line-height: 1.9;
+            text-shadow: 1px 1px 2px #000;
         }
         .start-btn {
-            background: transparent;
-            border: 2px solid var(--accent-gold);
-            color: var(--accent-gold);
-            padding: 15px 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            letter-spacing: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
+            background: #2d3748; border: 3px solid var(--accent-gold); color: var(--accent-gold);
+            padding: 14px 60px; font-size: 1.4rem; font-weight: bold; letter-spacing: 6px;
+            border-radius: 6px; cursor: pointer; text-shadow: 1px 1px 1px #000;
+            box-shadow: 0 6px 0 #1a202c, 0 10px 20px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
         }
-        .start-btn:hover {
-            background: var(--accent-gold);
-            color: #05070a;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-            transform: scale(1.05);
-        }
+        .start-btn:hover { background: #3a475c; transform: translateY(-2px); }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a202c; }
 
-        /* 遊戲本體 UI */
-        .top-navbar { height: 65px; background: #0b0e14; border-bottom: 2px solid var(--accent-gold); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; }
-        .game-main-wrapper { position: absolute; top: 65px; bottom: 140px; left: 0; width: 100%; padding: 20px; display: flex; gap: 20px; }
-        .left-panel { width: 340px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
-        .right-panel { flex: 1; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 25px; overflow-y: auto; position: relative; }
+        /* 遊戲核心介面 UI */
+        .top-navbar { height: 60px; background: #0b0e14; border-bottom: 3px solid var(--accent-gold); padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
+        .game-main-wrapper { position: absolute; top: 60px; bottom: 130px; left: 0; width: 100%; padding: 15px; display: flex; gap: 15px; }
+        .left-panel { width: 320px; background: var(--panel-bg); border: 2px solid var(--panel-border); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .right-panel { flex: 1; background: var(--panel-bg); border: 2px solid var(--panel-border); padding: 20px; overflow-y: auto; position: relative; }
+        
+        /* 📊 3. 數值跳動感進度條 */
         .stat-group { margin-bottom: 2px; }
-        .stat-header { font-size: 0.95rem; margin-bottom: 6px; font-weight: bold; display: flex; justify-content: space-between;}
-        .bar-container { background: #090c12; height: 16px; border-radius: 4px; border: 1px solid #1e2533; overflow: hidden; }
-        .bar-fill { height: 100%; width: 50%; transition: width 0.4s ease; }
-        .fill-pol { background-color: var(--color-pol); }
-        .fill-eco { background-color: var(--color-eco); }
-        .fill-def { background-color: var(--color-def); }
-        .fill-cul { background-color: var(--color-cul); }
+        .stat-header { font-size: 0.95rem; margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; text-shadow: 1px 1px 1px #000; }
+        .bar-container { background: #000; height: 18px; border: 1px solid #4a5568; pading: 1px; }
+        .bar-fill { height: 100%; width: 50%; transition: width 0.15s cubic-bezier(0.1, 0.8, 0.1, 1); } /* 加快變動速度營造閃爍硬直感 */
+        .fill-pol { background-color: var(--color-pol); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
+        .fill-eco { background-color: var(--color-eco); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
+        .fill-def { background-color: var(--color-def); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
+        .fill-cul { background-color: var(--color-cul); box-shadow: inset 0 0 6px rgba(255,255,255,0.4); }
         
-        .era-tag { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; }
-        .status-normal { background: rgba(212,175,55,0.2); border: 1px solid var(--accent-gold); color: var(--accent-gold); }
+        .era-tag { display: inline-block; padding: 4px 10px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; border: 2px solid var(--accent-gold); background: #000; color: var(--accent-gold); }
 
-        .event-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; color: #fff; }
-        .event-desc { font-size: 1rem; line-height: 1.7; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 18px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid var(--accent-gold); }
-        .advisor-card { background: #181e2b; border: 1px solid #283349; border-radius: 6px; padding: 18px; margin-bottom: 14px; cursor: pointer; transition: 0.2s ease-in-out; }
-        .advisor-card:hover { border-color: var(--accent-gold); background: #1e2637; transform: translateX(5px); }
-        .advisor-name { font-size: 1rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 6px; }
+        .event-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .event-desc { font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; background: #0b0f17; padding: 15px; border: 1px dashed var(--panel-border); margin-bottom: 15px; }
         
-        .review-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 10, 0.97); z-index: 100; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .modal-content { max-width: 720px; background: #161b26; border: 2px solid var(--accent-gold); border-radius: 8px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-        .modal-title { font-size: 1.25rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 18px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; }
-        .modal-text { font-size: 1rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 25px; }
-        .modal-btn { background: var(--accent-gold); color: #05070a; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .bottom-log-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 140px; background: #0b0e14; border-top: 1px solid var(--panel-border); padding: 15px 30px; }
-        .log-container { height: 100%; overflow-y: auto; font-size: 0.85rem; color: #64748b; line-height: 1.8; }
-        .restart-btn { background: transparent; border: 2px solid var(--accent-gold); color: var(--accent-gold); padding: 12px 35px; font-size: 1rem; border-radius: 4px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        /* 🎴 朝臣卡片（經典 Flash 按鈕反饋） */
+        .advisor-card { background: #232d3f; border: 2px solid #3a4a63; padding: 14px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 0 #0f141c; }
+        .advisor-card:hover { border-color: var(--accent-gold); background: #2c394f; transform: translateY(-2px); box-shadow: 0 6px 0 #0f141c; }
+        .advisor-card:active { transform: translateY(3px); box-shadow: 0 1px 0 #0f141c; }
+        .advisor-name { font-size: 1rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 4px; }
         
-        .disaster-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #f87171; font-size: 0.9rem; line-height: 1.5; }
+        /* 📜 3. 太史公秘卷彈簧跳出特效 */
+        .review-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; align-items: center; }
+        .modal-content { max-width: 650px; background: #1a2230; border: 3px solid var(--accent-gold); padding: 25px; box-shadow: 0 0 30px #000; animation: flashPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-title { font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 15px; border-bottom: 2px dashed var(--panel-border); padding-bottom: 10px; }
+        .modal-text { font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 20px; }
+        .modal-btn { background: var(--accent-gold); color: #000; border: 2px solid #fff; padding: 10px 25px; font-size: 1rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #977117; }
+        .modal-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #977117; }
 
-        /* 動態特效代碼 */
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); } 50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); } 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); } }
+        .bottom-log-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 130px; background: #0b0e14; border-top: 2px solid var(--panel-border); padding: 12px 25px; }
+        .log-container { height: 100%; overflow-y: auto; font-size: 0.85rem; color: #718096; line-height: 1.7; font-family: monospace; }
+        .restart-btn { background: #e53e3e; border: 2px solid #fff; color: #fff; padding: 10px 30px; font-size: 1rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #9b2c2c; }
+        .restart-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #9b2c2c; }
+        
+        .disaster-alert { background: #2d1c1c; border: 2px solid #e53e3e; padding: 10px; margin-bottom: 12px; color: #fc8181; font-size: 0.88rem; animation: blink 1s infinite alternate; }
+
+        /* 🎬 Flash 靈魂經典動畫 */
+        @keyframes flashZoomIn { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes flashPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes blink { from { border-color: #e53e3e; } to { border-color: #742a2a; } }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen" class="intro-screen">
-        <div class="intro-title">天命最高</div>
-        <div class="intro-subtitle">
-            「天命無常，唯有德者居之。」<br>
-            歷史的洪流從非死板的直線。朝代治亂興衰、立國是中衰或鼎盛，<br>
-            皆取決於你在政治、經濟、國防與文明天平上的實時博弈。<br>
-            大華帝國的命運，由你落子。
-        </div>
-        <button class="start-btn" onclick="startGame()">執掌天命</button>
-    </div>
+    <div class="flash-stage">
 
-    <div class="top-navbar">
-        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 天命最高：動態興衰系統（歷史思辨版）</div>
-        <div style="font-size: 1rem; color: #94a3b8;"><span id="display-years" style="color: #fff;">載入中...</span></div>
-    </div>
-
-    <div class="game-main-wrapper">
-        <div class="left-panel">
-            <div style="color:var(--text-muted); font-size:0.85rem; border-bottom:1px solid var(--panel-border); padding-bottom:5px; font-weight: bold;">帝國四大核心國力</div>
-            <div class="stat-group"><div class="stat-header">🏛️ 政治清明 <span id="val-politics">50</span></div><div class="bar-container"><div id="bar-politics" class="bar-fill fill-pol"></div></div></div>
-            <div class="stat-group"><div class="stat-header">💰 經濟生產 <span id="val-economy">50</span></div><div class="bar-container"><div id="bar-economy" class="bar-fill fill-eco"></div></div></div>
-            <div class="stat-group"><div class="stat-header">⚔️ 國防軍武 <span id="val-defense">50</span></div><div class="bar-container"><div id="bar-defense" class="bar-fill fill-def"></div></div></div>
-            <div class="stat-group"><div class="stat-header">📜 文化文治 <span id="val-culture">50</span> <span id="cul-status" style="font-size:0.75rem; color:#ef4444;"></span></div><div class="bar-container"><div id="bar-culture" class="bar-fill fill-cul"></div></div></div>
-            <hr style="border:0; border-top:1px solid var(--panel-border); width:100%; margin: 10px 0;">
-            <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
-                <b>💡 統治法則：</b><br>
-                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或全盤胡化）。<br>
-                2. 政治、經濟、國防任一歸 <b>0</b> 即刻亡國。<br>
-                3. 朝代盛衰實時動態分流，考驗你的動態拆彈與維持能力。
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-text" id="loading-text">NOW LOADING... 0%</div>
+            <div class="loading-bar-border">
+                <div id="loading-bar-fill" class="loading-bar-fill"></div>
             </div>
         </div>
 
-        <div class="right-panel" id="action-zone">
-            <div id="review-modal" class="review-modal" style="display: none;">
-                <div class="modal-content">
-                    <div class="modal-title" id="modal-title">📜 太史公秘卷 · 三朝策論鏡鑑</div>
-                    <div id="modal-text" class="modal-text">解析載入中...</div>
-                    <button class="modal-btn" onclick="closeModal()">朕已知曉各朝得失</button>
+        <div id="intro-screen" class="intro-screen">
+            <div class="intro-title">天命最高</div>
+            <div class="intro-subtitle">
+                「天命無常，唯有德者居之。」<br><br>
+                歷史的洪流從非死板的直線。朝代治亂興衰、立國是中衰或鼎盛，<br>
+                皆取決於你在政治、經濟、國防與文明天平上的實時博弈。<br>
+                大華帝國的命運，由你落子。
+            </div>
+            <button class="start-btn" onclick="startGame()">執掌天命</button>
+        </div>
+
+        <div class="top-navbar">
+            <div style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold); letter-spacing: 2px; text-shadow: 2px 2px 0 #000;">👑 天命最高</div>
+            <div style="font-size: 1rem; color: #a0aec0; font-family: monospace;"><span id="display-years" style="color: #fff;">載入中...</span></div>
+        </div>
+
+        <div class="game-main-wrapper">
+            <div class="left-panel">
+                <div style="color:var(--text-muted); font-size:0.85rem; border-bottom:2px solid var(--panel-border); padding-bottom:5px; font-weight: bold; text-align: center;">帝國四大核心國力</div>
+                <div class="stat-group"><div class="stat-header">🏛️ 政治清明 <span id="val-politics">50</span></div><div class="bar-container"><div id="bar-politics" class="bar-fill fill-pol"></div></div></div>
+                <div class="stat-group"><div class="stat-header">💰 經濟生產 <span id="val-economy">50</span></div><div class="bar-container"><div id="bar-economy" class="bar-fill fill-eco"></div></div></div>
+                <div class="stat-group"><div class="stat-header">⚔️ 國防軍武 <span id="val-defense">50</span></div><div class="bar-container"><div id="bar-defense" class="bar-fill fill-def"></div></div></div>
+                <div class="stat-group"><div class="stat-header">📜 文化文治 <span id="val-culture">50</span> <span id="cul-status" style="font-size:0.75rem; color:#f56565;"></span></div><div class="bar-container"><div id="bar-culture" class="bar-fill fill-cul"></div></div></div>
+                <hr style="border:0; border-top:2px dashed var(--panel-border); width:100%; margin: 8px 0;">
+                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6; background: #0b0e14; padding: 8px; border: 1px solid #2d3748;">
+                    <b>💡 統治法則：</b><br>
+                    1. 文化歸 0 不會亡國。<br>
+                    2. 政治、經濟、國防任一歸 0 即刻亡國。<br>
+                    3. 朝代盛衰實時動態分流。
                 </div>
             </div>
 
-            <div id="disaster-zone"></div>
-            <span id="state-badge" class="era-tag status-normal">當前國勢：動態計算中</span>
-            <div id="event-title" class="event-title">載入中...</div>
-            <div id="event-desc" class="event-desc">載入中...</div>
-            <div id="advisors-group"></div>
-        </div>
-    </div>
+            <div class="right-panel" id="action-zone">
+                <div id="review-modal" class="review-modal">
+                    <div class="modal-content">
+                        <div class="modal-title" id="modal-title">📜 太史公秘卷 · 三朝策論鏡鑑</div>
+                        <div id="modal-text" class="modal-text">解析載入中...</div>
+                        <button class="modal-btn" onclick="closeModal()">朕已知曉各朝得失</button>
+                    </div>
+                </div>
 
-    <div class="bottom-log-panel"><div class="log-container" id="history-log"><div>📜 [編年史] 天命既定，大華基業肇始。</div></div></div>
+                <div id="disaster-zone"></div>
+                <span id="state-badge" class="era-tag">當前國勢：動態計算中</span>
+                <div id="event-title" class="event-title">載入中...</div>
+                <div id="event-desc" class="event-desc">載入中...</div>
+                <div id="advisors-group"></div>
+            </div>
+        </div>
+
+        <div class="bottom-log-panel"><div class="log-container" id="history-log"><div>📜 [編年史] 天命既定，大華基業肇始。</div></div></div>
+
+    </div>
 
     <script src="events.js"></script>
     
     <script>
+        // 🎵 2. 免外部下載的 Flash 蜂鳴音效系統 (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playFlashSound(type) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'hover') {
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+                } else if (type === 'click') {
+                    osc.type = 'square'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'disaster') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'complete') {
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+                }
+            } catch(e) {}
+        }
+
         let stats = { politics: 50, economy: 50, defense: 50, culture: 50 };
         let currentRound = 1;
         let nextModalText = ""; 
         const maxRounds = 25;
         let usedEventIds = new Set();
 
+        // ⏳ 5. 模擬 Flash 經典的 Loading 載入進度條
+        function runSimulatedLoading() {
+            let progress = 0;
+            const fill = document.getElementById('loading-bar-fill');
+            const text = document.getElementById('loading-text');
+            
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 2;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    fill.style.width = '100%';
+                    text.innerText = "🎬 LOAD COMPLETE!";
+                    playFlashSound('complete');
+                    
+                    // 1秒後切換到封面
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('intro-screen').style.display = 'flex';
+                    }, 800);
+                } else {
+                    fill.style.width = progress + '%';
+                    text.innerText = `NOW LOADING... ${progress}%`;
+                    if (progress % 20 === 0) playFlashSound('hover');
+                }
+            }, 60);
+        }
+
         // 🎬 關閉導入畫面，正式開始遊戲
         function startGame() {
+            playFlashSound('click');
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
             setTimeout(() => {
                 intro.style.visibility = 'hidden';
-            }, 1000);
+            }, 500);
         }
 
         function updateUI() {
-            document.getElementById('display-years').innerText = `天命紀元 第 ${currentRound} / ${maxRounds} 案`;
+            document.getElementById('display-years').innerText = `ROUND: ${currentRound} / ${maxRounds}`;
             
             ["politics", "economy", "defense", "culture"].forEach(s => {
                 stats[s] = Math.min(100, Math.max(0, stats[s]));
@@ -196,7 +292,7 @@
             });
 
             if (stats.culture <= 0) {
-                document.getElementById('cul-status').innerText = "(文明斷代/全盤異化)";
+                document.getElementById('cul-status').innerText = "(文明斷代)";
             } else {
                 document.getElementById('cul-status').innerText = "";
             }
@@ -204,17 +300,13 @@
             let totalPower = stats.politics + stats.economy + stats.defense;
             let badge = document.getElementById('state-badge');
             if (currentRound === 1) {
-                badge.innerText = "🌱 歷史起點：新朝立國奠基";
-                badge.style.borderColor = "#3b82f6"; badge.style.color = "#60a5fa";
+                badge.innerText = "🌱 新朝立國奠基";
             } else if (totalPower >= 180) {
-                badge.innerText = "☀️ 盛世景象：國家步入鼎盛擴張";
-                badge.style.borderColor = "#10b981"; badge.style.color = "#34d399";
+                badge.innerText = "☀️ 盛世景象：鼎盛擴張";
             } else if (totalPower >= 110) {
-                badge.innerText = "⚖️ 平穩維持：國勢處於守成期";
-                badge.style.borderColor = "#d4af37"; badge.style.color = "#d4af37";
+                badge.innerText = "⚖️ 平穩守成";
             } else {
-                badge.innerText = "⚡ 警報：決策失當，國家直接步入中衰！";
-                badge.style.borderColor = "#ef4444"; badge.style.color = "#f87171";
+                badge.innerText = "⚡ 帝國中衰";
             }
         }
 
@@ -241,11 +333,7 @@
             }
 
             let available = pool.filter(e => !usedEventIds.has(e.id));
-            
-            if (available.length === 0) {
-                available = gameEvents.filter(e => !usedEventIds.has(e.id));
-            }
-
+            if (available.length === 0) available = gameEvents.filter(e => !usedEventIds.has(e.id));
             if (available.length === 0) return null;
             
             let chosen = available[Math.floor(Math.random() * available.length)];
@@ -260,17 +348,18 @@
             activeDisasterEffect = null;
 
             if (currentRound > 1 && Math.random() < 0.25) {
+                playFlashSound('disaster');
                 let d = randomDisasters[Math.floor(Math.random() * randomDisasters.length)];
                 container.innerHTML = `
                     <div class="disaster-alert">
-                        <b>⚠️ 突發天災黑天鵝事件：【${d.name}】</b><br>
-                        ${d.desc} (本回合結算時將強制扣減：政治${d.effects.politics || 0}，經濟${d.effects.economy || 0}，國防${d.effects.defense || 0})
+                        <b>⚠️ 突發天災：【${d.name}】</b><br>
+                        ${d.desc} (強制扣減：政治${d.effects.politics || 0}，經濟${d.effects.economy || 0}，國防${d.effects.defense || 0})
                     </div>
                 `;
                 activeDisasterEffect = d.effects;
                 
                 let log = document.getElementById('history-log');
-                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈佇立。</div>` + log.innerHTML;
+                log.innerHTML = `<div style="color:#f56565;">⚡ [天災] 遭遇 ${d.name}。</div>` + log.innerHTML;
             }
         }
 
@@ -280,7 +369,7 @@
                 if (status.dead) {
                     return triggerEnd(false, status.title, status.desc);
                 } else {
-                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "<b>恭喜！你成功帶領國家走完了 25 個獨立歷史事件的考驗，承接住了最高天命！</b><br><br>你完美證實了朝代的盛衰並非一條死板的直線，而是由每一個經濟、政治、國防政策疊加後的連動結果。即使你曾中途步入中衰，或者文化幾度歸零，但你依舊保住了政權火種！");
+                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "恭喜！你成功帶領國家走完了 25 個獨立歷史事件的考驗，承接住了最高天命！");
                 }
             }
 
@@ -288,9 +377,7 @@
             tryTriggerDisaster();
 
             let activeEvent = pullNextEvent();
-            if (!activeEvent) {
-                return triggerEnd(true, "🏆 歷史思辨通關", "所有核心事件池已演繹完畢！");
-            }
+            if (!activeEvent) return triggerEnd(true, "🏆 通關", "所有事件池已演繹完畢！");
 
             document.getElementById('event-title').innerText = activeEvent.title;
             document.getElementById('event-desc').innerText = activeEvent.description;
@@ -300,8 +387,12 @@
             activeEvent.advisors.forEach(a => {
                 let card = document.createElement('div');
                 card.className = 'advisor-card';
-                card.innerHTML = `<div class="advisor-name">${a.name}</div><div style="font-style:italic; color:#94a3b8; margin-bottom:8px;">「${a.quote}」</div>`;
+                card.innerHTML = `<div class="advisor-name">${a.name}</div><div style="font-style:italic; color:#a0aec0; font-size:0.88rem;">「${a.quote}」</div>`;
+                
+                // 🔊 音效綁定
+                card.onmouseenter = () => playFlashSound('hover');
                 card.onclick = () => {
+                    playFlashSound('click');
                     nextModalText = a.historicalNote;
                     applyEffects(a.effects);
                 };
@@ -326,19 +417,21 @@
         }
 
         function closeModal() {
+            playFlashSound('click');
             document.getElementById('review-modal').style.display = 'none';
             let log = document.getElementById('history-log');
-            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 政策已定，天命天平已重組。</div>` + log.innerHTML;
+            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 天命天平已重組。</div>` + log.innerHTML;
             currentRound++;
             loadTurn();
         }
 
         function triggerEnd(isVictory, title, text) {
+            playFlashSound('disaster');
             let zone = document.getElementById('action-zone');
             zone.innerHTML = `
                 <div style="text-align:center; padding: 20px 0;">
-                    <h2 style="color:var(--accent-gold); font-size: 1.8rem; margin-bottom:15px;">${title}</h2>
-                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); padding: 25px; border-radius: 6px; text-align: left; line-height: 1.8; margin-bottom:25px; font-size:1.05rem;">
+                    <h2 style="color:var(--accent-gold); font-size: 1.6rem; margin-bottom:15px; text-shadow:1px 1px 0 #000;">${title}</h2>
+                    <div style="background: #0b0e14; border: 2px dashed var(--panel-border); padding: 20px; text-align: left; line-height: 1.8; margin-bottom:25px; font-size:0.95rem;">
                         ${text}
                     </div>
                     <button class="restart-btn" onclick="location.reload()">重新推演天命</button>
@@ -347,7 +440,7 @@
         }
 
         window.onload = function() {
-            loadTurn();
+            runSimulatedLoading();
         };
     </script>
 </body>
