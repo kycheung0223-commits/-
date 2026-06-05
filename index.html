@@ -3,427 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天命最高 - Mandate Supreme (完美策略運作版)</title>
+    <title>天命最高 - Mandate Supreme (純淨修復版)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* ==========================================
-           1. 全域重設與獨立遊戲畫布
-           ========================================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { background-color: #030202; color: #e2e8f0; font-family: 'Noto Serif TC', serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        body {
-            background-color: #030202;
-            color: #e2e8f0;
-            font-family: 'Noto Serif TC', serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* 4:3 固定復古畫布 */
         #game-stage {
-            width: 1024px;
-            height: 768px;
-            border: 5px double #b8860b;
-            box-shadow: 0 0 60px rgba(0,0,0,1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            
-            /* 純 CSS 繪製皇家幽暗金鑾殿背景 */
+            width: 1024px; height: 768px; border: 5px double #b8860b; box-shadow: 0 0 60px rgba(0,0,0,1); position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
             background: 
                 radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, transparent 60%),
                 linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(13, 9, 6, 0.4) 40%, rgba(26, 18, 12, 0.9) 90%),
-                repeating-linear-gradient(90deg, rgba(212,175,55,0.02) 0px, rgba(212,175,55,0.02) 2px, transparent 2px, transparent 40px),
-                repeating-linear-gradient(0deg, rgba(212,175,55,0.02) 0px, rgba(212,175,55,0.02) 2px, transparent 2px, transparent 40px),
                 #0a0705;
         }
 
-        /* 內嵌 SVG 手繪「黑金雕龍屏風與大內龍椅」 */
-        #game-stage::before {
-            content: '';
-            position: absolute;
-            top: 15%; left: 50%;
-            transform: translateX(-50%);
-            width: 600px; height: 350px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='350' viewBox='0 0 600 350'%3E%3Cpath d='M300 40 L450 120 L450 280 L150 280 L150 120 Z' fill='none' stroke='%23d4af37' stroke-width='1.5' stroke-opacity='0.15'/%3E%3Ccircle cx='300' cy='160' r='60' fill='none' stroke='%23d4af37' stroke-width='1' stroke-opacity='0.2' stroke-dasharray='5,5'/%3E%3Cpath d='M250 160 Q300 110 350 160 T450 160' fill='none' stroke='%23ffd700' stroke-width='2' stroke-opacity='0.1'/%3E%3C/svg%3E");
-            background-size: cover;
-            box-shadow: inset 0 -20px 50px rgba(0,0,0,0.9);
-            border-bottom: 3px solid rgba(212, 175, 55, 0.2);
-            opacity: 0.7;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* 宮殿朱紅廊柱 */
-        .palace-pillar-left, .palace-pillar-right {
-            position: absolute;
-            top: 0; width: 60px; height: 100%;
-            background: linear-gradient(90deg, #1a0505 0%, #4a0d0d 40%, #2a0808 70%, #050000 100%);
-            box-shadow: 0 0 30px rgba(0,0,0,0.9);
-            z-index: 3;
-            pointer-events: none;
-        }
-        .palace-pillar-left { left: 0; border-right: 1px solid rgba(212,175,55,0.2); }
-        .palace-pillar-right { right: 0; border-left: 1px solid rgba(212,175,55,0.2); }
-
-        /* 殿堂暗角大氣濾鏡 */
-        #game-stage::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 25%, rgba(0, 0, 0, 0.85) 100%);
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .panel {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
-        }
-
+        .panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 10; }
         .hidden { display: none !important; }
 
-        /* ==========================================
-           2. 頂部金色 HUD 資源列（四大國力顯示機制）
-           ========================================== */
-        .hud-header {
-            width: 100%;
-            height: 75px;
-            background: linear-gradient(180deg, #0f0a05 0%, rgba(28, 20, 12, 0.95) 100%);
-            border-bottom: 2px solid #d4af37;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 40px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
-            z-index: 20;
-        }
-
-        .hud-turn {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 26px;
-            color: #ffd700;
-            border-right: 1px solid #4a351a;
-            padding-right: 25px;
-            text-shadow: 2px 2px 4px #000;
-            min-width: 130px;
-        }
-
-        .stat-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 165px;
-            position: relative;
-        }
-
-        .stat-icon {
-            font-size: 18px;
-            width: 34px; height: 34px;
-            background: #23150b;
-            border: 1px solid #d4af37;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #ffd700;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-        }
-
+        /* 頂部 四大國力 HUD Display */
+        .hud-header { width: 100%; height: 75px; background: linear-gradient(180deg, #0f0a05 0%, rgba(28, 20, 12, 0.95) 100%); border-bottom: 2px solid #d4af37; display: flex; justify-content: space-around; align-items: center; padding: 0 40px; z-index: 20; }
+        .hud-turn { font-family: 'Ma Shan Zheng', cursive; font-size: 26px; color: #ffd700; border-right: 1px solid #4a351a; padding-right: 25px; min-width: 130px; }
+        .stat-box { display: flex; align-items: center; gap: 10px; width: 165px; position: relative; }
+        .stat-icon { width: 34px; height: 34px; background: #23150b; border: 1px solid #d4af37; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #ffd700; }
         .stat-body { flex-grow: 1; }
+        .stat-label-container { display: flex; justify-content: space-between; font-size: 13px; color: #cbd5e1; margin-bottom: 4px; font-weight: bold; }
+        .stat-bar-bg { width: 100%; height: 7px; background: #111; border: 1px solid #4a351a; border-radius: 4px; overflow: hidden; }
+        .stat-bar-fill { height: 100%; width: 50%; background: linear-gradient(90deg, #8b0000, #d4af37); transition: width 0.3s ease; }
+        .stat-trend { position: absolute; right: -5px; top: -12px; font-size: 12px; font-weight: bold; display: none; }
+        .trend-up { color: #52c41a; display: block; }
+        .trend-down { color: #f5222d; display: block; }
 
-        .stat-label-container {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #cbd5e1;
-            margin-bottom: 4px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
-        }
+        /* 朝堂大政與隨機事件區 */
+        .court-stage { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 30px 60px; z-index: 15; }
+        .empire-banner { font-family: 'Ma Shan Zheng', cursive; font-size: 36px; color: #ffffff; letter-spacing: 12px; margin-bottom: 25px; text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        .scroll-container { width: 760px; background: linear-gradient(180deg, rgba(24, 18, 12, 0.96) 0%, rgba(14, 10, 6, 0.98) 100%); border: 2px solid #d4af37; border-radius: 4px; padding: 25px 40px; text-align: center; margin-bottom: 40px; }
+        .scroll-title { font-family: 'Ma Shan Zheng', cursive; font-size: 26px; color: #ffd700; margin-bottom: 12px; }
+        .scroll-desc { font-size: 17px; line-height: 1.6; color: #f0e6d2; text-align: justify; }
 
-        /* 策略體驗改良：滑鼠懸停時隱約跳出的變動預測提示燈 */
-        .stat-trend {
-            position: absolute;
-            right: -5px; top: -12px;
-            font-size: 12px;
-            font-weight: bold;
-            display: none;
-        }
-        .trend-up { color: #52c41a; display: block; animation: pulse 0.8s infinite alternate; }
-        .trend-down { color: #f5222d; display: block; animation: pulse 0.8s infinite alternate; }
-
-        @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 1; } }
-
-        .stat-bar-bg {
-            width: 100%; height: 7px;
-            background: #111;
-            border: 1px solid #4a351a;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .stat-bar-fill {
-            height: 100%; width: 50%;
-            background: linear-gradient(90deg, #8b0000, #d4af37);
-            transition: width 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
-        }
-
-        /* ==========================================
-           3. 朝堂操作對立核心區
-           ========================================== */
-        .court-stage {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 30px 60px;
-            z-index: 15;
-        }
-
-        .empire-banner {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 36px;
-            color: #ffffff;
-            letter-spacing: 12px;
-            text-shadow: 0 0 20px rgba(212,175,55,0.7), 2px 2px 5px #000;
-            margin-bottom: 25px;
-        }
-
-        /* 描金捲軸大政背景 */
-        .scroll-container {
-            width: 760px;
-            background: linear-gradient(180deg, rgba(24, 18, 12, 0.96) 0%, rgba(14, 10, 6, 0.98) 100%);
-            border: 2px solid #d4af37;
-            border-radius: 4px;
-            padding: 25px 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
-            text-align: center;
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .scroll-container::before, .scroll-container::after {
-            content: '';
-            position: absolute;
-            left: 15px; right: 15px; height: 1px;
-            background: linear-gradient(90deg, transparent, #d4af37, transparent);
-        }
-        .scroll-container::before { top: 8px; }
-        .scroll-container::after { bottom: 8px; }
-
-        .scroll-title {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 26px;
-            color: #ffd700;
-            margin-bottom: 12px;
-            letter-spacing: 2px;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .scroll-desc {
-            font-size: 17px;
-            line-height: 1.6;
-            color: #f0e6d2;
-            text-align: justify;
-        }
-
-        /* 實體奏折三路博弈區 */
-        .proposals-grid {
-            width: 860px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            align-items: flex-start;
-        }
-
-        /* 策略體驗改良：為三大執政大臣做精美「派系色彩分流」 */
-        .memorial-card {
-            border-radius: 4px;
-            padding: 22px 16px;
-            cursor: pointer;
-            box-shadow: 0 12px 25px rgba(0,0,0,0.8);
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            text-align: center;
-            min-height: 210px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        /* 文官：深青瓷藍 */
-        .civil-card {
-            background: linear-gradient(180deg, rgba(20, 32, 48, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
-            border: 2px solid #2b4c7e;
-        }
-        /* 戶部：深古銅黃 */
-        .eco-card {
-            background: linear-gradient(180deg, rgba(48, 38, 20, 0.95) 0%, rgba(25, 20, 10, 0.98) 100%);
-            border: 2px solid #8c6d31;
-        }
-        /* 武將：重玄鐵紅 */
-        .mil-card {
-            background: linear-gradient(180deg, rgba(50, 22, 22, 0.95) 0%, rgba(25, 10, 10, 0.98) 100%);
-            border: 2px solid #8e2b2b;
-        }
-
-        /* 奏折古典標籤 */
-        .memorial-tag {
-            position: absolute;
-            top: -11px; left: 50%;
-            transform: translateX(-50%);
-            padding: 1px 14px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 12px;
-            border: 1px solid #d4af37;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-        }
-        .tag-civil { background: #1a365d; color: #63b3ed; border-color: #3182ce; }
-        .tag-eco { background: #4a3716; color: #f6ad55; border-color: #dd6b20; }
-        .tag-military { background: #5c1d1d; color: #fc8181; border-color: #e53e3e; }
-
+        /* 三大臣奏折卡片 */
+        .proposals-grid { width: 860px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .memorial-card { border-radius: 4px; padding: 22px 16px; cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease; position: relative; text-align: center; min-height: 210px; display: flex; flex-direction: column; }
+        .civil-card { background: linear-gradient(180deg, #142030 0%, #0a0f19 100%); border: 2px solid #2b4c7e; }
+        .eco-card { background: linear-gradient(180deg, #302614 0%, #19140a 100%); border: 2px solid #8c6d31; }
+        .mil-card { background: linear-gradient(180deg, #321616 0%, #190a0a 100%); border: 2px solid #8e2b2b; }
+        .memorial-tag { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); padding: 1px 14px; font-size: 12px; font-weight: bold; border-radius: 12px; border: 1px solid #d4af37; }
+        .tag-civil { background: #1a365d; color: #63b3ed; }
+        .tag-eco { background: #4a3716; color: #f6ad55; }
+        .tag-military { background: #5c1d1d; color: #fc8181; }
         .memorial-icon { font-size: 24px; margin-top: 8px; margin-bottom: 6px; }
         .civil-card .memorial-icon { color: #63b3ed; }
         .eco-card .memorial-icon { color: #f6ad55; }
         .mil-card .memorial-icon { color: #fc8181; }
-
-        .memorial-author {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 20px;
-            color: #f0e6d2;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(212,175,55,0.2);
-            padding-bottom: 4px;
-        }
-
+        .memorial-author { font-family: 'Ma Shan Zheng', cursive; font-size: 20px; color: #f0e6d2; margin-bottom: 10px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 4px; }
         .memorial-text { font-size: 14px; line-height: 1.5; color: #cbd5e1; text-align: left; }
+        .memorial-card:hover { transform: translateY(-8px); border-color: #ffd700; }
 
-        /* 懸停躍動跨步效果 */
-        .memorial-card:hover {
-            transform: translateY(-12px);
-            border-color: #ffd700;
-            box-shadow: 0 20px 35px rgba(255, 215, 0, 0.3);
-        }
+        /* 底部 編年史日誌 */
+        .chronicle-log-bar { width: 100%; height: 45px; background: #0a0603; border-top: 2px solid #d4af37; display: flex; align-items: center; padding: 0 40px; font-size: 14px; color: #cbd5e1; z-index: 20; }
+        .chronicle-log-bar i { color: #ffd700; margin-right: 12px; }
 
-        /* ==========================================
-           4. 底部宣紙編年史日誌
-           ========================================== */
-        .chronicle-log-bar {
-            width: 100%;
-            height: 45px;
-            background: linear-gradient(90deg, #0a0603 0%, #17100a 50%, #0a0603 100%);
-            border-top: 2px solid #d4af37;
-            display: flex;
-            align-items: center;
-            padding: 0 40px;
-            font-size: 14px;
-            color: #cbd5e1;
-            z-index: 20;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px #000;
-        }
-        .chronicle-log-bar i { color: #ffd700; margin-right: 12px; font-size: 15px; }
-
-        /* ==========================================
-           5. 系統過場與結局
-           ========================================== */
-        #loading-panel, #menu-panel, #gameover-panel {
-            justify-content: center;
-            align-items: center;
-            background: #070504;
-        }
-        
-        .menu-title {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 80px;
-            color: #ffd700;
-            text-shadow: 0 0 30px rgba(212,175,55,0.4), 3px 3px 0px #6b0000;
-            margin-bottom: 50px;
-            letter-spacing: 14px;
-        }
-
-        .royal-btn {
-            background: linear-gradient(180deg, #4a0d0d 0%, #1c0303 100%);
-            border: 2px solid #d4af37;
-            color: #f0e6d2;
-            padding: 14px 50px;
-            font-size: 22px;
-            font-family: 'Noto Serif TC', serif;
-            font-weight: bold;
-            letter-spacing: 6px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-            transition: all 0.2s ease;
-            border-radius: 2px;
-        }
-        .royal-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(180deg, #6b1515 0%, #2d0606 100%);
-            border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
-        }
-
-        .loader-box { width: 350px; text-align: center; }
-        .loader-bg { width: 100%; height: 8px; background: #111; border: 1px solid #332211; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
-        .loader-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #8b0000, #d4af37); }
-
-        .go-title { font-family: 'Ma Shan Zheng', cursive; font-size: 64px; color: #e53e3e; margin-bottom: 15px; text-shadow: 0 0 20px rgba(229,62,62,0.3); }
+        /* 結局畫面 */
+        #gameover-panel { justify-content: center; align-items: center; background: #070504; }
+        .go-title { font-family: 'Ma Shan Zheng', cursive; font-size: 64px; color: #e53e3e; margin-bottom: 15px; }
         .go-reason { font-size: 24px; color: #ffd700; font-family: 'Ma Shan Zheng', cursive; margin-bottom: 35px; }
-        .go-desc-box { width: 660px; background: rgba(15, 10, 7, 0.96); border: 1px solid #d4af37; padding: 25px; text-align: justify; margin-bottom: 40px; line-height: 1.6; color: #ebdcb9; box-shadow: 0 15px 30px rgba(0,0,0,0.9); }
-
-        /* 打擊感震動 */
-        @keyframes screenShake {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-4px, 2px) rotate(-0.5deg); }
-            40% { transform: translate(4px, -2px) rotate(0.5deg); }
-            60% { transform: translate(-2px, -1px) rotate(0deg); }
-            80% { transform: translate(2px, 2px) rotate(0.5deg); }
-        }
-        .shake-active { animation: screenShake 0.3s ease-in-out; }
+        .go-desc-box { width: 660px; background: rgba(15, 10, 7, 0.96); border: 1px solid #d4af37; padding: 25px; text-align: justify; margin-bottom: 40px; line-height: 1.6; color: #ebdcb9; }
+        .royal-btn { background: linear-gradient(180deg, #4a0d0d 0%, #1c0303 100%); border: 2px solid #d4af37; color: #f0e6d2; padding: 14px 50px; font-size: 22px; font-family: 'Noto Serif TC', serif; font-weight: bold; cursor: pointer; letter-spacing: 4px; }
     </style>
 </head>
 <body>
 
     <div id="game-stage">
         
-        <div class="palace-pillar-left"></div>
-        <div class="palace-pillar-right"></div>
-        
-        <div id="loading-panel" class="panel">
-            <h1 class="menu-title" style="font-size: 64px; margin-bottom: 25px;">天命最高</h1>
-            <div class="loader-box">
-                <div class="loader-bg"><div id="loader-fill" class="loader-fill"></div></div>
-                <div id="loader-msg" style="font-size: 13px; color: #a0aec0; letter-spacing: 2px;">正推開金鑾大門...</div>
-            </div>
-        </div>
-
-        <div id="menu-panel" class="panel hidden">
-            <h1 class="menu-title">天命最高</h1>
-            <button class="royal-btn" onclick="startGame()">執掌天命</button>
-        </div>
-
-        <div id="game-panel" class="panel hidden">
+        <div id="game-panel" class="panel">
             <div class="hud-header">
                 <div id="hud-turn-display" class="hud-turn">宣德 元年</div>
                 
@@ -468,26 +123,26 @@
                 <div class="empire-banner">👑 大華帝國 · 奉天承運</div>
                 
                 <div class="scroll-container">
-                    <h2 id="current-event-title" class="scroll-title">當前朝政大政</h2>
-                    <p id="current-event-desc" class="scroll-desc">聽取三方執政代表呈遞御批奏折...</p>
+                    <h2 id="current-event-title" class="scroll-title">載入中...</h2>
+                    <p id="current-event-desc" class="scroll-desc">正在召集文武百官，請稍候...</p>
                 </div>
 
                 <div class="proposals-grid">
-                    <div id="card-0" class="memorial-card civil-card" onclick="makeChoice(0)" onmouseenter="showTrend(0)" onmouseleave="hideTrend()">
+                    <div class="memorial-card civil-card" onclick="makeChoice(0)" onmouseenter="showTrend(0)" onmouseleave="hideTrend()">
                         <div class="memorial-tag tag-civil">📜 主和派奏折</div>
                         <div class="memorial-icon"><i class="fa-solid fa-feather-pointed"></i></div>
                         <div class="memorial-author">文華殿大學士</div>
                         <p id="prop-civil" class="memorial-text">載入中...</p>
                     </div>
 
-                    <div id="card-1" class="memorial-card eco-card" onclick="makeChoice(1)" onmouseenter="showTrend(1)" onmouseleave="hideTrend()">
+                    <div class="memorial-card eco-card" onclick="makeChoice(1)" onmouseenter="showTrend(1)" onmouseleave="hideTrend()">
                         <div class="memorial-tag tag-eco">📜 權宜派奏折</div>
                         <div class="memorial-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                         <div class="memorial-author">戶部尚書</div>
                         <p id="prop-eco" class="memorial-text">載入中...</p>
                     </div>
 
-                    <div id="card-2" class="memorial-card mil-card" onclick="makeChoice(2)" onmouseenter="showTrend(2)" onmouseleave="hideTrend()">
+                    <div class="memorial-card mil-card" onclick="makeChoice(2)" onmouseenter="showTrend(2)" onmouseleave="hideTrend()">
                         <div class="memorial-tag tag-military">📜 主戰派奏折</div>
                         <div class="memorial-icon"><i class="fa-solid fa-sword"></i></div>
                         <div class="memorial-author">兵部大將軍</div>
@@ -503,66 +158,19 @@
 
         <div id="gameover-panel" class="panel hidden">
             <h1 id="go-title-text" class="go-title">天命崩解</h1>
-            <div id="go-reason-text" class="go-reason">權力失衡，江山易主</div>
-            <div class="go-desc-box">
-                <p id="go-summary-text">大華歷史至此發生偏折...</p>
-            </div>
+            <div id="go-reason-text" class="go-reason">權力失衡</div>
+            <div class="go-desc-box"><p id="go-summary-text">歷史發生偏折...</p></div>
             <button class="royal-btn" onclick="restartGame()">重新登基</button>
         </div>
 
     </div>
 
     <script>
-        // 初始化四大國力數值
         let stats = { pol: 50, eco: 50, mil: 50, cul: 50 };
         let currentTurn = 1;
         let eventPool = [];
         let currentEvent = null;
 
-        // 利用 Web Audio API 實時音頻合成器
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(isSeal) {
-            try {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                if (isSeal) {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(90, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(25, audioCtx.currentTime + 0.3);
-                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                } else {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(750, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                }
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } catch(e) {}
-        }
-
-        // 開機獨立加載動畫
-        window.addEventListener('DOMContentLoaded', () => {
-            let fill = document.getElementById('loader-fill');
-            let msg = document.getElementById('loader-msg');
-            let progress = 0;
-            let txts = ["推開金鑾大門...", "整肅朝臣衣冠...", "鋪設天子案前奏折...", "天命已至！"];
-            
-            let timer = setInterval(() => {
-                progress += 2;
-                if (fill) fill.style.width = progress + '%';
-                if(progress === 25 && msg) msg.innerText = txts[1];
-                if(progress === 60 && msg) msg.innerText = txts[2];
-                if(progress === 85 && msg) msg.innerText = txts[3];
-                if(progress >= 100) {
-                    clearInterval(timer);
-                    document.getElementById('loading-panel').classList.add('hidden');
-                    document.getElementById('menu-panel').classList.remove('hidden');
-                }
-            }, 15);
-        });
-
-        // 完備歷史大政與三分支博弈資料庫
         const baseEvents = [
             {
                 title: "匈奴突襲寇邊",
@@ -588,7 +196,7 @@
                 choices: [
                     { txt: "「由禮部重新開科，重申儒家公正，洗刷讀書人處境。」", effect: { pol: 20, eco: -5, mil: 0, cul: 15 }, log: "重新開科維護了仕子公正，天下文風大盛，文臣高呼萬歲。" },
                     { txt: "「將涉案豪商處以巨額罰銀，沒收財產入國庫，涉案官員降職。」", effect: { pol: -15, eco: 30, mil: -5, cul: -5 }, log: "沒收貪墨資產，國庫瞬間爆滿，但科舉威信下降引發士林議論。" },
-                    { txt: "「此乃動搖國本！著兵部與特務機構介入，通通滿門抄斬。」", effect: { pol: 10, eco: -5, mil: 20, cul: -15 }, log: "武將和特務全面血洗江南官場，殺一儆百，軍威雷霆震懾朝廷。" }
+                    { txt: "http「此乃動搖國本！著兵部與特務機構介入，通通滿門抄斬。」", effect: { pol: 10, eco: -5, mil: 20, cul: -15 }, log: "武將和特務全面血洗江南官場，殺一儆百，軍威雷霆震懾朝廷。" }
                 ]
             },
             {
@@ -602,32 +210,21 @@
             }
         ];
 
-        // 啟動遊戲
-        function startGame() {
-            playSound(false);
-            document.getElementById('menu-panel').classList.add('hidden');
-            document.getElementById('game-panel').classList.remove('hidden');
-            
-            // 重置核心國力數據
+        // 頁面載入完畢立刻無縫初始化並執行
+        window.onload = function() {
             stats = { pol: 50, eco: 50, mil: 50, cul: 50 };
             currentTurn = 1;
             eventPool = [...baseEvents];
-            
             updateHUD();
             nextEvent();
-        }
+        };
 
-        // 核心四大國力與進度條即時渲染更新
         function updateHUD() {
             document.getElementById('hud-turn-display').innerText = `宣德 ${convertToChineseYear(currentTurn)}年`;
-            
             const keys = ['pol', 'eco', 'mil', 'cul'];
             keys.forEach(k => {
-                // 1. 更新數字
                 document.getElementById(`val-${k}`).innerText = stats[k];
-                // 2. 更新進度條長度
                 document.getElementById(`bar-${k}`).style.width = stats[k] + '%';
-                // 3. 臨界危險血條變紅預警
                 document.getElementById(`bar-${k}`).style.background = stats[k] <= 20 ? 
                     "linear-gradient(90deg, #ff0000, #8b0000)" : "linear-gradient(90deg, #8b0000, #d4af37)";
             });
@@ -638,58 +235,36 @@
             return num <= 10 ? arr[num] : num;
         }
 
-        // 核心事件隨機抽卡機制
         function nextEvent() {
-            if (eventPool.length === 0) {
-                eventPool = [...baseEvents];
-            }
-            // 隨機抽取
+            if (eventPool.length === 0) eventPool = [...baseEvents];
             let idx = Math.floor(Math.random() * eventPool.length);
             currentEvent = eventPool.splice(idx, 1)[0];
 
-            // 更改畫面上大政捲軸的文字內容
             document.getElementById('current-event-title').innerText = `當前朝政大政 · ${currentEvent.title}`;
             document.getElementById('current-event-desc').innerText = currentEvent.desc;
 
-            // 將三路抉擇內容完美填入三封大臣奏折卡片
             document.getElementById('prop-civil').innerText = currentEvent.choices[0].txt;
             document.getElementById('prop-eco').innerText = currentEvent.choices[1].txt;
             document.getElementById('prop-military').innerText = currentEvent.choices[2].txt;
-            
-            hideTrend(); // 清除上一回合的預期殘留
+            hideTrend();
         }
 
-        // 蓋章做選擇（數據更新與日誌紀錄）
         function makeChoice(index) {
-            playSound(true);
-            
-            // 物理蓋章打擊感：畫面劇烈震動
-            const stage = document.getElementById('game-stage');
-            stage.classList.add('shake-active');
-            setTimeout(() => stage.classList.remove('shake-active'), 300);
-
             let choice = currentEvent.choices[index];
-            
-            // 理算數值：絕對限制在 0-100 區間內
             for(let key in choice.effect) {
                 stats[key] = Math.max(0, Math.min(100, stats[key] + choice.effect[key]));
             }
 
-            // 更新底部宣紙編年史日誌
+            // 更新編年史日誌
             document.getElementById('history-bar-log').innerHTML = `<i class="fa-solid fa-pen-nib"></i> 宣德${convertToChineseYear(currentTurn)}年：${choice.log}`;
-            
-            // 即時同步頂部 HUD 數據變動
             updateHUD();
 
-            // 判斷生死/通關
             if (checkGameOver()) return;
 
             currentTurn++;
-            // 半秒的數據結算緩衝
-            setTimeout(nextEvent, 450);
+            nextEvent();
         }
 
-        // 策略功能：滑鼠移入時顯示影響趨勢 (▲/▼)
         function showTrend(choiceIndex) {
             if (!currentEvent) return;
             hideTrend();
@@ -697,13 +272,8 @@
             for (let key in effect) {
                 let trendEl = document.getElementById(`trend-${key}`);
                 if (trendEl) {
-                    if (effect[key] > 0) {
-                        trendEl.innerText = "▲";
-                        trendEl.className = "stat-trend trend-up";
-                    } else if (effect[key] < 0) {
-                        trendEl.innerText = "▼";
-                        trendEl.className = "stat-trend trend-down";
-                    }
+                    if (effect[key] > 0) { trendEl.innerText = "▲"; trendEl.className = "stat-trend trend-up"; }
+                    else if (effect[key] < 0) { trendEl.innerText = "▼"; trendEl.className = "stat-trend trend-down"; }
                 }
             }
         }
@@ -716,33 +286,31 @@
             });
         }
 
-        // 生死大局與結局系統
         function checkGameOver() {
             let dead = false; let reason = ""; let sum = "";
 
             if (stats.pol <= 0) {
                 reason = "【政治清明歸零 · 朝臣架空】";
-                sum = "聖上在位期間權臣勾結、朋黨之爭橫行。內閣與文官集團聯手發動逼宮，奪走了皇權玉璽，您被軟禁於瀛台，大華江山就此易主。";
+                sum = "內閣與文官集團聯手發動逼宮，奪走了皇權玉璽，您被軟禁於瀛台，大華江山易主。";
                 dead = true;
             } else if (stats.eco <= 0) {
                 reason = "【經濟生產歸零 · 財政崩潰】";
-                sum = "國庫徹底掏空，邊防軍餉與百官俸祿常年無法發放。山東與江南同時爆發百萬流民起義，叛軍攻陷京師，大華宣德朝宣告覆滅。";
+                sum = "國庫徹底掏空，邊防軍餉無法發放。各地爆發百萬流民起義，大華朝宣告覆滅。";
                 dead = true;
             } else if (stats.mil <= 0) {
                 reason = "【國防武備歸零 · 外敵破關】";
-                sum = "朝廷極度重文輕武，九邊重鎮武備荒廢。匈奴三十萬鐵騎趁夜破關長驅直入，攻破紫禁城，聖上被迫自縊於景山，天命就此斷絕。";
+                sum = "九邊重鎮武備荒廢。匈奴三十萬鐵騎趁夜破關長驅直入，攻破紫禁城，江山斷絕。";
                 dead = true;
             } else if (stats.cul <= 0) {
                 reason = "【文化傳承歸零 · 禮崩樂壞】";
-                sum = "帝國一味推行商業壓榨或鐵腕軍事清洗，導致天下斯文掃地、禮崩樂壞。朝廷喪失了合法性，各地宗室紛紛打著清君側旗號舉兵，天下大亂。";
+                sum = "天下斯文掃地、禮崩樂壞。朝廷喪失合法性，各地宗室割據舉兵，天下大亂。";
                 dead = true;
             } else if (currentTurn >= 10) {
-                // 成功熬過 10 年
                 document.getElementById('game-panel').classList.add('hidden');
                 document.getElementById('gameover-panel').classList.remove('hidden');
                 document.getElementById('go-title-text').innerText = "✨ 天命最高 ✨";
-                document.getElementById('go-reason-text').innerText = "【功蓋千秋 · 萬世盛世】";
-                document.getElementById('go-summary-text').innerText = "聖上在位十載，文治武功皆臻化境！朝堂政治海晏河清，國庫流金充盈，北疆百戰伏首，文化萬邦來朝。大華帝國成功延續了至高天命，史稱「宣德盛世」！";
+                document.getElementById('go-reason-text').innerText = "【功蓋千秋 · 打造萬世盛世】";
+                document.getElementById('go-summary-text').innerText = "聖上在位十載，文治武功皆臻化境！大華帝國成功延續了至高天命，史稱「宣德盛世」！";
                 return true;
             }
 
@@ -757,10 +325,14 @@
             return false;
         }
 
-        // 重新登基
         function restartGame() {
             document.getElementById('gameover-panel').classList.add('hidden');
-            startGame();
+            document.getElementById('game-panel').classList.remove('hidden');
+            stats = { pol: 50, eco: 50, mil: 50, cul: 50 };
+            currentTurn = 1;
+            eventPool = [...baseEvents];
+            updateHUD();
+            nextEvent();
         }
     </script>
 </body>
