@@ -226,7 +226,7 @@
                     <div class="hud-bar"><div id="b-defense" class="hud-fill" style="background-color:var(--color-def)"></div></div>
                 </div>
             </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;" id="round-indicator">奏議：1 / 5</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;" id="round-indicator">奏議：1 / 2</div>
         </div>
 
         <div class="dragon-throne-center"></div>
@@ -254,7 +254,6 @@
     </div>
 
     <script>
-        // 📦 歷史事件資料庫
         const scenarios = [
             {
                 title: "論開國宗廟與法統制",
@@ -319,7 +318,7 @@
             document.getElementById("decree-text").innerText = current.desc;
 
             const floor = document.getElementById("advisors-floor");
-            floor.innerHTML = ""; // 清空上一輪
+            floor.innerHTML = ""; 
 
             // 建立懸浮奏摺面板
             const scroll = document.createElement("div");
@@ -349,12 +348,10 @@
                 card.onclick = (e) => {
                     e.stopPropagation();
                     
-                    // 移除之前選中，進入群臣退下狀態
                     document.querySelectorAll(".advisor-silhouette").forEach(c => c.classList.remove("stepped-forward"));
                     floor.classList.add("has-active-selection");
                     card.classList.add("stepped-forward");
 
-                    // 填充並彈出奏摺
                     document.getElementById("p-quote").innerText = opt.quote;
                     const effBox = document.getElementById("p-eff");
                     effBox.innerHTML = "";
@@ -378,15 +375,10 @@
                 floor.appendChild(card);
             });
 
-            // 綁定確認御批事件
             document.getElementById("p-submit").onclick = (e) => {
                 e.stopPropagation();
-                
-                // 蓋章動畫
                 const stamp = document.getElementById("seal-stamp");
                 stamp.style.animation = "sealPlunge 0.15s ease-out forwards";
-                
-                // 螢幕震動
                 document.getElementById("main-stage").classList.add("shake");
 
                 setTimeout(() => {
@@ -398,7 +390,6 @@
         }
 
         function nextTurn() {
-            // 應用數值變更
             stats.politics += selectedEffect.politics;
             stats.economy += selectedEffect.economy;
             stats.defense += selectedEffect.defense;
