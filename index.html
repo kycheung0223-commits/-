@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大華帝國：天命動態弦</title>
+    <style>
+        :root {
+            --bg-dark: #090b0e;
+            --panel-bg: #121620;
+            --panel-border: #242c3d;
+            --accent-gold: #d4af37;
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --color-pol: #3b82f6;
+            --color-eco: #10b981;
+            --color-def: #ef4444;
+            --color-cul: #8b5cf6;
+        }
+        * { box-sizing: border-box; user-select: none; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+        .top-navbar { height: 65px; background: #0b0e14; border-bottom: 2px solid var(--accent-gold); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; }
+        .game-main-wrapper { position: absolute; top: 65px; bottom: 140px; left: 0; width: 100%; padding: 20px; display: flex; gap: 20px; }
+        .left-panel { width: 340px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+        .right-panel { flex: 1; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 25px; overflow-y: auto; position: relative; }
+        .stat-group { margin-bottom: 2px; }
+        .stat-header { font-size: 0.95rem; margin-bottom: 6px; font-weight: bold; display: flex; justify-content: space-between;}
+        .bar-container { background: #090c12; height: 16px; border-radius: 4px; border: 1px solid #1e2533; overflow: hidden; }
+        .bar-fill { height: 100%; width: 50%; transition: width 0.4s ease; }
+        .fill-pol { background-color: var(--color-pol); }
+        .fill-eco { background-color: var(--color-eco); }
+        .fill-def { background-color: var(--color-def); }
+        .fill-cul { background-color: var(--color-cul); }
+        
+        .era-tag { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px; }
+        .status-normal { background: rgba(212,175,55,0.2); border: 1px solid var(--accent-gold); color: var(--accent-gold); }
+
+        .event-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; color: #fff; }
+        .event-desc { font-size: 1rem; line-height: 1.7; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 18px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid var(--accent-gold); }
+        .advisor-card { background: #181e2b; border: 1px solid #283349; border-radius: 6px; padding: 18px; margin-bottom: 14px; cursor: pointer; transition: 0.2s ease-in-out; }
+        .advisor-card:hover { border-color: var(--accent-gold); background: #1e2637; transform: translateX(5px); }
+        .advisor-name { font-size: 1rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 6px; }
+        
+        .review-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 10, 0.97); z-index: 100; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .modal-content { max-width: 720px; background: #161b26; border: 2px solid var(--accent-gold); border-radius: 8px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .modal-title { font-size: 1.25rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 18px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; }
+        .modal-text { font-size: 1rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 25px; }
+        .modal-btn { background: var(--accent-gold); color: #05070a; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        .bottom-log-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 140px; background: #0b0e14; border-top: 1px solid var(--panel-border); padding: 15px 30px; }
+        .log-container { height: 100%; overflow-y: auto; font-size: 0.85rem; color: #64748b; line-height: 1.8; }
+        .restart-btn { background: transparent; border: 2px solid var(--accent-gold); color: var(--accent-gold); padding: 12px 35px; font-size: 1rem; border-radius: 4px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        
+        .disaster-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #f87171; font-size: 0.9rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="top-navbar">
+        <div style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold);">👑 大華帝國：天命動態興衰（歷史思辨版）</div>
+        <div style="font-size: 1rem; color: #94a3b8;"><span id="display-years" style="color: #fff;">載入中...</span></div>
+    </div>
+
+    <div class="game-main-wrapper">
+        <div class="left-panel">
+            <div style="color:var(--text-muted); font-size:0.85rem; border-bottom:1px solid var(--panel-border); padding-bottom:5px; font-weight: bold;">帝國四大核心國力</div>
+            <div class="stat-group"><div class="stat-header">🏛️ 政治清明 <span id="val-politics">50</span></div><div class="bar-container"><div id="bar-politics" class="bar-fill fill-pol"></div></div></div>
+            <div class="stat-group"><div class="stat-header">💰 經濟生產 <span id="val-economy">50</span></div><div class="bar-container"><div id="bar-economy" class="bar-fill fill-eco"></div></div></div>
+            <div class="stat-group"><div class="stat-header">⚔️ 國防軍武 <span id="val-defense">50</span></div><div class="bar-container"><div id="bar-defense" class="bar-fill fill-def"></div></div></div>
+            <div class="stat-group"><div class="stat-header">📜 文化文治 <span id="val-culture">50</span> <span id="cul-status" style="font-size:0.75rem; color:#ef4444;"></span></div><div class="bar-container"><div id="bar-culture" class="bar-fill fill-cul"></div></div></div>
+            <hr style="border:0; border-top:1px solid var(--panel-border); width:100%; margin: 10px 0;">
+            <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
+                <b>💡 統治法則變更：</b><br>
+                1. <b>文化歸 0 不會亡國</b>（象徵文明易主或極端胡化）。<br>
+                2. 政治、經濟、國防任一歸 <b>0</b> 即刻亡國。<br>
+                3. 朝代盛衰由你的選擇實時決定，可能<b>直接步入中衰</b>。
+            </div>
+        </div>
+
+        <div class="right-panel" id="action-zone">
+            <div id="review-modal" class="review-modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-title" id="modal-title">📜 太史公秘卷 · 三朝策論鏡鑑</div>
+                    <div id="modal-text" class="modal-text">解析載入中...</div>
+                    <button class="modal-btn" onclick="closeModal()">朕已知曉各朝得失</button>
+                </div>
+            </div>
+
+            <div id="disaster-zone"></div>
+            <span id="state-badge" class="era-tag status-normal">當前國勢：動態計算中</span>
+            <div id="event-title" class="event-title">載入中...</div>
+            <div id="event-desc" class="event-desc">載入中...</div>
+            <div id="advisors-group"></div>
+        </div>
+    </div>
+
+    <div class="bottom-log-panel"><div class="log-container" id="history-log"><div>📜 [編年史] 諸天先哲垂青，大華基業肇始。</div></div></div>
+
+    <script src="events.js"></script>
+    
+    <script>
+        let stats = { politics: 50, economy: 50, defense: 50, culture: 50 };
+        let currentRound = 1;
+        let nextModalText = ""; 
+        const maxRounds = 25;
+        let usedEventIds = new Set();
+
+        function updateUI() {
+            document.getElementById('display-years').innerText = `天命紀元 第 ${currentRound} / ${maxRounds} 案`;
+            
+            ["politics", "economy", "defense", "culture"].forEach(s => {
+                stats[s] = Math.min(100, Math.max(0, stats[s]));
+                document.getElementById(`val-${s}`).innerText = stats[s];
+                document.getElementById(`bar-${s}`).style.width = stats[s] + '%';
+            });
+
+            if (stats.culture <= 0) {
+                document.getElementById('cul-status').innerText = "(文明斷代/全盤異化)";
+            } else {
+                document.getElementById('cul-status').innerText = "";
+            }
+
+            let totalPower = stats.politics + stats.economy + stats.defense;
+            let badge = document.getElementById('state-badge');
+            if (currentRound === 1) {
+                badge.innerText = "🌱 歷史起點：新朝立國奠基";
+                badge.style.borderColor = "#3b82f6"; badge.style.color = "#60a5fa";
+            } else if (totalPower >= 180) {
+                badge.innerText = "☀️ 盛世景象：國家步入鼎盛擴張";
+                badge.style.borderColor = "#10b981"; badge.style.color = "#34d399";
+            } else if (totalPower >= 110) {
+                badge.innerText = "⚖️ 平穩維持：國勢處於守成期";
+                badge.style.borderColor = "#d4af37"; badge.style.color = "#d4af37";
+            } else {
+                badge.innerText = "⚡ 警報：決策失當，國家直接步入中衰！";
+                badge.style.borderColor = "#ef4444"; badge.style.color = "#f87171";
+            }
+        }
+
+        function checkGameOver() {
+            if (stats.politics <= 0) return { dead: true, title: "❌ 權臣篡位／政治瓦解", desc: "大華朝廷政令不出宮門。此結局重現了<b>東漢末年群雄割據、曹魏篡漢</b>的歷史悲劇。" };
+            if (stats.economy <= 0) return { dead: true, title: "❌ 流民遍地／經濟崩潰", desc: "財政徹底破產。百萬飢民揭竿而起，重現了<b>唐末黃巢之亂、明末李自成攻破北京</b>的慘烈場景。" };
+            if (stats.defense <= 0) return { dead: true, title: "❌ 神州橫磨／外敵入侵", desc: "北方游牧鐵騎長驅直入，擄走宗室。此結局重現了<b>西晉永嘉之禍、北宋靖康之難</b>。" };
+            if (currentRound > maxRounds) return { dead: false };
+            return null;
+        }
+
+        function pullNextEvent() {
+            let totalPower = stats.politics + stats.economy + stats.defense;
+            let pool = [];
+
+            if (currentRound <= 3) {
+                pool = gameEvents.filter(e => e.tags.includes("開國"));
+            } else if (totalPower >= 180) {
+                pool = gameEvents.filter(e => e.tags.includes("鼎盛"));
+            } else if (totalPower >= 110) {
+                pool = gameEvents.filter(e => e.tags.includes("守成"));
+            } else {
+                pool = gameEvents.filter(e => e.tags.includes("中衰"));
+            }
+
+            let available = pool.filter(e => !usedEventIds.has(e.id));
+            
+            if (available.length === 0) {
+                available = gameEvents.filter(e => !usedEventIds.has(e.id));
+            }
+
+            if (available.length === 0) return null;
+            
+            let chosen = available[Math.floor(Math.random() * available.length)];
+            usedEventIds.add(chosen.id);
+            return chosen;
+        }
+
+        let activeDisasterEffect = null;
+        function tryTriggerDisaster() {
+            let container = document.getElementById('disaster-zone');
+            container.innerHTML = "";
+            activeDisasterEffect = null;
+
+            if (currentRound > 1 && Math.random() < 0.25) {
+                let d = randomDisasters[Math.floor(Math.random() * randomDisasters.length)];
+                container.innerHTML = `
+                    <div class="disaster-alert">
+                        <b>⚠️ 突發天災黑天鵝事件：【${d.name}】</b><br>
+                        ${d.desc} (本回合結算時將強制扣減：政治${d.effects.politics || 0}，經濟${d.effects.economy || 0}，國防${d.effects.defense || 0})
+                    </div>
+                `;
+                activeDisasterEffect = d.effects;
+                
+                let log = document.getElementById('history-log');
+                log.innerHTML = `<div style="color:#ef4444;">⚡ [天災橫禍] 帝國遭遇 ${d.name}，生靈塗炭。</div>` + log.innerHTML;
+            }
+        }
+
+        function loadTurn() {
+            let status = checkGameOver();
+            if (status) {
+                if (status.dead) {
+                    return triggerEnd(false, status.title, status.desc);
+                } else {
+                    return triggerEnd(true, "🏆 天命長青 · 歷史思辨通關", "<b>恭喜！你成功帶領大華帝國走完了 25 個獨立歷史事件的考驗！</b><br><br>你完美證實了朝代的盛衰並非一條死板的直線，而是由每一個經濟、政治、國防政策疊加後的連動結果。即使你曾中途步入中衰，或者文化幾度歸零，但你依然保住了國家的政權火種！");
+                }
+            }
+
+            updateUI();
+            tryTriggerDisaster();
+
+            let activeEvent = pullNextEvent();
+            if (!activeEvent) {
+                return triggerEnd(true, "🏆 歷史思辨通關", "所有核心事件池已演繹完畢！");
+            }
+
+            document.getElementById('event-title').innerText = activeEvent.title;
+            document.getElementById('event-desc').innerText = activeEvent.description;
+
+            let box = document.getElementById('advisors-group');
+            box.innerHTML = '';
+            activeEvent.advisors.forEach(a => {
+                let card = document.createElement('div');
+                card.className = 'advisor-card';
+                card.innerHTML = `<div class="advisor-name">${a.name}</div><div style="font-style:italic; color:#94a3b8; margin-bottom:8px;">「${a.quote}」</div>`;
+                card.onclick = () => {
+                    nextModalText = a.historicalNote;
+                    applyEffects(a.effects);
+                };
+                box.appendChild(card);
+            });
+        }
+
+        function applyEffects(eff) {
+            stats.politics += (eff.politics || 0);
+            stats.economy += (eff.economy || 0);
+            stats.defense += (eff.defense || 0);
+            stats.culture += (eff.culture || 0);
+
+            if (activeDisasterEffect) {
+                stats.politics += (activeDisasterEffect.politics || 0);
+                stats.economy += (activeDisasterEffect.economy || 0);
+                stats.defense += (activeDisasterEffect.defense || 0);
+            }
+
+            document.getElementById('modal-text').innerHTML = nextModalText;
+            document.getElementById('review-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('review-modal').style.display = 'none';
+            let log = document.getElementById('history-log');
+            log.innerHTML = `<div>✍️ [第 ${currentRound} 案結算] 政策已定，數值天平已重組。</div>` + log.innerHTML;
+            currentRound++;
+            loadTurn();
+        }
+
+        function triggerEnd(isVictory, title, text) {
+            let zone = document.getElementById('action-zone');
+            zone.innerHTML = `
+                <div style="text-align:center; padding: 20px 0;">
+                    <h2 style="color:var(--accent-gold); font-size: 1.8rem; margin-bottom:15px;">${title}</h2>
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); padding: 25px; border-radius: 6px; text-align: left; line-height: 1.8; margin-bottom:25px; font-size:1.05rem;">
+                        ${text}
+                    </div>
+                    <button class="restart-btn" onclick="location.reload()">重新推演天命</button>
+                </div>
+            `;
+        }
+
+        window.onload = function() {
+            loadTurn();
+        };
+    </script>
+</body>
+</html>
