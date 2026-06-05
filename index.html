@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天命最高 - Mandate Supreme (方案 B 實體對立版)</title>
+    <title>天命最高 - Mandate Supreme (完整運作修復版)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* 全域重設與背景鎖定 */
+        /* ==========================================
+           1. 全域重設與畫布鎖定
+           ========================================== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,7 +22,7 @@
         }
 
         body {
-            background-color: #050505;
+            background-color: #030202;
             color: #e2e8f0;
             font-family: 'Noto Serif TC', serif;
             height: 100vh;
@@ -30,27 +32,61 @@
             overflow: hidden;
         }
 
-        /* 1024x768 4:3 復古獨立遊戲視窗 */
+        /* 4:3 復古獨立遊戲視窗 */
         #game-stage {
             width: 1024px;
             height: 768px;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), 
-                        url('http://googleusercontent.com/image_generation_content/3') center/cover;
-            border: 5px double #d4af37; /* 皇家暗金雙線邊框 */
-            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 120px rgba(0,0,0,0.95);
+            border: 5px double #b8860b;
+            box-shadow: 0 0 60px rgba(0,0,0,1);
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
+            
+            /* 純 CSS 繪製金鑾殿幽暗地磚與深宮遠景透視 */
+            background: 
+                radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(13, 9, 6, 0.4) 40%, rgba(26, 18, 12, 0.9) 90%),
+                repeating-linear-gradient(90deg, rgba(212,175,55,0.02) 0px, rgba(212,175,55,0.02) 2px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(0deg, rgba(212,175,55,0.02) 0px, rgba(212,175,55,0.02) 2px, transparent 2px, transparent 40px),
+                #0a0705;
         }
 
-        /* 殿堂暗角濾鏡 (Vignette) 增加龍椅的明暗對比磅礡感 */
+        /* 使用內嵌 SVG 繪製「黑金雕龍屏風與大內龍椅」剪影 */
+        #game-stage::before {
+            content: '';
+            position: absolute;
+            top: 15%; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 350px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='350' viewBox='0 0 600 350'%3E%3Cpath d='M300 40 L450 120 L450 280 L150 280 L150 120 Z' fill='none' stroke='%23d4af37' stroke-width='1.5' stroke-opacity='0.15'/%3E%3Ccircle cx='300' cy='160' r='60' fill='none' stroke='%23d4af37' stroke-width='1' stroke-opacity='0.2' stroke-dasharray='5,5'/%3E%3Cpath d='M250 160 Q300 110 350 160 T450 160' fill='none' stroke='%23ffd700' stroke-width='2' stroke-opacity='0.1'/%3E%3C/svg%3E");
+            background-size: cover;
+            box-shadow: inset 0 -20px 50px rgba(0,0,0,0.9);
+            border-bottom: 3px solid rgba(212, 175, 55, 0.2);
+            opacity: 0.7;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* 宮殿朱紅廊柱裝飾邊緣 */
+        .palace-pillar-left, .palace-pillar-right {
+            position: absolute;
+            top: 0; width: 60px; height: 100%;
+            background: linear-gradient(90deg, #1a0505 0%, #4a0d0d 40%, #2a0808 70%, #050000 100%);
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            z-index: 3;
+            pointer-events: none;
+        }
+        .palace-pillar-left { left: 0; border-right: 1px solid rgba(212,175,55,0.2); }
+        .palace-pillar-right { right: 0; border-left: 1px solid rgba(212,175,55,0.2); }
+
+        /* 殿堂暗角大氣濾鏡 */
         #game-stage::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.75) 100%);
+            background: radial-gradient(circle, transparent 25%, rgba(0, 0, 0, 0.85) 100%);
             pointer-events: none;
             z-index: 5;
         }
@@ -66,18 +102,18 @@
         .hidden { display: none !important; }
 
         /* ==========================================
-           1. 頂部金色 HUD 資源列
+           2. 頂部金色 HUD 資源列
            ========================================== */
         .hud-header {
             width: 100%;
             height: 75px;
-            background: linear-gradient(180deg, rgba(15, 10, 5, 0.98) 0%, rgba(30, 22, 12, 0.88) 100%);
+            background: linear-gradient(180deg, #0f0a05 0%, rgba(28, 20, 12, 0.95) 100%);
             border-bottom: 2px solid #d4af37;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            padding: 0 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
             z-index: 20;
         }
 
@@ -86,19 +122,20 @@
             font-size: 26px;
             color: #ffd700;
             border-right: 1px solid #4a351a;
-            padding-right: 20px;
-            text-shadow: 1px 1px 2px #000;
+            padding-right: 25px;
+            text-shadow: 2px 2px 4px #000;
+            min-width: 130px;
         }
 
         .stat-box {
             display: flex;
             align-items: center;
             gap: 10px;
-            width: 170px;
+            width: 165px;
         }
 
         .stat-icon {
-            font-size: 20px;
+            font-size: 18px;
             width: 34px; height: 34px;
             background: #23150b;
             border: 1px solid #d4af37;
@@ -107,7 +144,7 @@
             justify-content: center;
             align-items: center;
             color: #ffd700;
-            box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
         }
 
         .stat-body { flex-grow: 1; }
@@ -116,14 +153,14 @@
             display: flex;
             justify-content: space-between;
             font-size: 13px;
-            color: #e2e8f0;
-            margin-bottom: 3px;
+            color: #cbd5e1;
+            margin-bottom: 4px;
             font-weight: bold;
             text-shadow: 1px 1px 2px #000;
         }
 
         .stat-bar-bg {
-            width: 100%; height: 8px;
+            width: 100%; height: 7px;
             background: #111;
             border: 1px solid #4a351a;
             border-radius: 4px;
@@ -137,7 +174,7 @@
         }
 
         /* ==========================================
-           2. 核心舞台：朝堂核心區
+           3. 朝堂操作對立核心區
            ========================================== */
         .court-stage {
             flex-grow: 1;
@@ -145,33 +182,32 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            padding: 25px 40px;
+            padding: 30px 60px;
             z-index: 15;
         }
 
         .empire-banner {
             font-family: 'Ma Shan Zheng', cursive;
-            font-size: 38px;
+            font-size: 36px;
             color: #ffffff;
-            letter-spacing: 10px;
-            text-shadow: 0 0 15px rgba(212,175,55,0.6), 2px 2px 4px #000;
-            margin-bottom: 20px;
+            letter-spacing: 12px;
+            text-shadow: 0 0 20px rgba(212,175,55,0.7), 2px 2px 5px #000;
+            margin-bottom: 25px;
         }
 
-        /* 2.1 描金捲軸大政背景 */
+        /* 描金捲軸大政背景 */
         .scroll-container {
-            width: 780px;
-            background: linear-gradient(180deg, rgba(28, 20, 12, 0.95) 0%, rgba(18, 12, 7, 0.98) 100%);
+            width: 760px;
+            background: linear-gradient(180deg, rgba(24, 18, 12, 0.96) 0%, rgba(14, 10, 6, 0.98) 100%);
             border: 2px solid #d4af37;
             border-radius: 4px;
-            padding: 25px 45px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            padding: 25px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
             text-align: center;
             position: relative;
-            margin-bottom: 35px;
+            margin-bottom: 40px;
         }
 
-        /* 捲軸古典裝飾細線 */
         .scroll-container::before, .scroll-container::after {
             content: '';
             position: absolute;
@@ -187,61 +223,58 @@
             color: #ffd700;
             margin-bottom: 12px;
             letter-spacing: 2px;
+            text-shadow: 1px 1px 2px #000;
         }
 
         .scroll-desc {
-            font-size: 18px;
+            font-size: 17px;
             line-height: 1.6;
             color: #f0e6d2;
             text-align: justify;
         }
 
-        /* 2.2 左右/橫向博弈的實體奏折卡片區 (方案 B 三路分歧) */
+        /* 左右對立博弈的實體奏折佈局 */
         .proposals-grid {
-            width: 880px;
+            width: 860px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 24px;
             align-items: flex-start;
         }
 
         .memorial-card {
-            background: linear-gradient(180deg, rgba(40, 30, 20, 0.95) 0%, rgba(20, 15, 10, 0.98) 100%);
+            background: linear-gradient(180deg, rgba(36, 26, 18, 0.96) 0%, rgba(18, 13, 9, 0.98) 100%);
             border: 2px solid #8b6c3f;
             border-radius: 4px;
-            padding: 20px 15px;
+            padding: 22px 16px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
-            transition: all 0.25s ease;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.8);
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
             text-align: center;
-            min-height: 190px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
         }
 
-        /* 奏折派系標籤 */
+        /* 奏折古典標籤 */
         .memorial-tag {
             position: absolute;
             top: -11px; left: 50%;
             transform: translateX(-50%);
-            padding: 1px 12px;
+            padding: 1px 14px;
             font-size: 12px;
             font-weight: bold;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #d4af37;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
         }
         .tag-civil { background: #1a365d; color: #63b3ed; border-color: #3182ce; }
         .tag-eco { background: #2d3748; color: #f6ad55; border-color: #dd6b20; }
         .tag-military { background: #5c1d1d; color: #fc8181; border-color: #e53e3e; }
 
-        .memorial-icon {
-            font-size: 24px;
-            margin-top: 8px;
-            margin-bottom: 5px;
-        }
+        .memorial-icon { font-size: 24px; margin-top: 8px; margin-bottom: 6px; }
         .tag-civil ~ .memorial-icon { color: #63b3ed; }
         .tag-eco ~ .memorial-icon { color: #f6ad55; }
         .tag-military ~ .memorial-icon { color: #fc8181; }
@@ -250,121 +283,110 @@
             font-family: 'Ma Shan Zheng', cursive;
             font-size: 20px;
             color: #f0e6d2;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #4a351a;
             padding-bottom: 4px;
         }
 
-        .memorial-text {
-            font-size: 15px;
-            line-height: 1.5;
-            color: #cbd5e1;
-            text-align: left;
-        }
+        .memorial-text { font-size: 15px; line-height: 1.5; color: #cbd5e1; text-align: left; }
 
-        /* 方案 B 朝堂向前跨步與高亮動畫 */
+        /* 奏折高亮跨步動效 */
         .memorial-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-12px);
             border-color: #ffd700;
-            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.2);
-            background: linear-gradient(180deg, rgba(55, 40, 25, 0.98) 0%, rgba(25, 18, 12, 1) 100%);
+            box-shadow: 0 20px 35px rgba(255, 215, 0, 0.25);
+            background: linear-gradient(180deg, rgba(50, 38, 26, 0.98) 0%, rgba(22, 16, 11, 1) 100%);
         }
 
         /* ==========================================
-           3. 底部宣紙編年史日誌
+           4. 底部宣紙編年史日誌
            ========================================== */
         .chronicle-log-bar {
             width: 100%;
             height: 45px;
-            background: linear-gradient(90deg, #100a05 0%, #1a120b 50%, #100a05 100%);
+            background: linear-gradient(90deg, #0a0603 0%, #17100a 50%, #0a0603 100%);
             border-top: 2px solid #d4af37;
             display: flex;
             align-items: center;
-            padding: 0 30px;
-            font-size: 15px;
-            color: #a0aec0;
+            padding: 0 40px;
+            font-size: 14px;
+            color: #cbd5e1;
             z-index: 20;
             letter-spacing: 1px;
             text-shadow: 1px 1px 2px #000;
         }
-        .chronicle-log-bar i {
-            color: #ffd700;
-            margin-right: 12px;
-            font-size: 16px;
-        }
+        .chronicle-log-bar i { color: #ffd700; margin-right: 12px; font-size: 15px; }
 
         /* ==========================================
-           4. 遊戲加載與選單 (Flash 緩衝風格)
+           5. 遊戲過場與加載面板
            ========================================== */
         #loading-panel, #menu-panel, #gameover-panel {
             justify-content: center;
             align-items: center;
-            background: rgba(10, 7, 5, 0.85);
+            background: #070504;
         }
-
-        #loading-panel { background: #0d0d0d; }
         
         .menu-title {
             font-family: 'Ma Shan Zheng', cursive;
-            font-size: 88px;
+            font-size: 80px;
             color: #ffd700;
-            text-shadow: 0 0 30px rgba(212,175,55,0.5), 3px 3px 0px #8b0000;
-            margin-bottom: 60px;
-            letter-spacing: 12px;
+            text-shadow: 0 0 30px rgba(212,175,55,0.4), 3px 3px 0px #6b0000;
+            margin-bottom: 50px;
+            letter-spacing: 14px;
         }
 
         .royal-btn {
-            background: linear-gradient(180deg, #4a0d0d 0%, #220505 100%);
+            background: linear-gradient(180deg, #4a0d0d 0%, #1c0303 100%);
             border: 2px solid #d4af37;
             color: #f0e6d2;
-            padding: 14px 45px;
+            padding: 14px 50px;
             font-size: 22px;
             font-family: 'Noto Serif TC', serif;
             font-weight: bold;
             letter-spacing: 6px;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
             transition: all 0.2s ease;
             border-radius: 2px;
         }
         .royal-btn:hover {
             transform: translateY(-2px);
-            background: linear-gradient(180deg, #6b1515 0%, #3a0808 100%);
+            background: linear-gradient(180deg, #6b1515 0%, #2d0606 100%);
             border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
         }
 
-        /* 經典加載條 */
-        .loader-box { width: 400px; text-align: center; }
-        .loader-bg { width: 100%; height: 10px; background: #111; border: 1px solid #444; border-radius: 5px; overflow: hidden; margin-bottom: 12px; }
-        .loader-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #8b0000, #d4af37); transition: width 0.1s linear; }
+        .loader-box { width: 350px; text-align: center; }
+        .loader-bg { width: 100%; height: 8px; background: #111; border: 1px solid #332211; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .loader-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #8b0000, #d4af37); }
 
-        /* ==========================================
-           5. 結局畫面與環境震動
-           ========================================== */
-        .go-title { font-family: 'Ma Shan Zheng', cursive; font-size: 68px; color: #e53e3e; margin-bottom: 15px; }
+        .go-title { font-family: 'Ma Shan Zheng', cursive; font-size: 64px; color: #e53e3e; margin-bottom: 15px; text-shadow: 0 0 20px rgba(229,62,62,0.3); }
         .go-reason { font-size: 24px; color: #ffd700; font-family: 'Ma Shan Zheng', cursive; margin-bottom: 35px; }
-        .go-desc-box { width: 680px; background: rgba(15, 10, 8, 0.95); border: 1px solid #d4af37; padding: 25px; text-align: justify; margin-bottom: 40px; line-height: 1.6; }
+        .go-desc-box { width: 660px; background: rgba(15, 10, 7, 0.96); border: 1px solid #d4af37; padding: 25px; text-align: justify; margin-bottom: 40px; line-height: 1.6; color: #ebdcb9; box-shadow: 0 15px 30px rgba(0,0,0,0.9); }
 
+        /* 視窗震動 */
         @keyframes screenShake {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-3px, 2px) rotate(-0.5deg); }
-            40% { transform: translate(3px, -1px) rotate(0.5deg); }
-            60% { transform: translate(-2px, -2px) rotate(0deg); }
-            80% { transform: translate(2px, 1px) rotate(0.5deg); }
+            20% { transform: translate(-4px, 2px) rotate(-0.5deg); }
+            40% { transform: translate(4px, -2px) rotate(0.5deg); }
+            60% { transform: translate(-2px, -1px) rotate(0deg); }
+            80% { transform: translate(2px, 2px) rotate(0.5deg); }
         }
-        .shake-active { animation: screenShake 0.35s ease-in-out; }
+        .shake-active { animation: screenShake 0.3s ease-in-out; }
     </style>
 </head>
 <body>
 
     <div id="game-stage">
         
+        <div class="palace-pillar-left"></div>
+        <div class="palace-pillar-right"></div>
+        
         <div id="loading-panel" class="panel">
-            <h1 class="menu-title" style="font-size: 72px; margin-bottom: 30px;">天命最高</h1>
+            <h1 class="menu-title" style="font-size: 64px; margin-bottom: 25px;">天命最高</h1>
             <div class="loader-box">
                 <div class="loader-bg"><div id="loader-fill" class="loader-fill"></div></div>
-                <div id="loader-msg" style="font-size: 14px; color: #a0aec0; letter-spacing: 2px;">正推開金鑾殿大門...</div>
+                <div id="loader-msg" style="font-size: 13px; color: #a0aec0; letter-spacing: 2px;">正推開金鑾大門...</div>
             </div>
         </div>
 
@@ -451,7 +473,7 @@
             <h1 id="go-title-text" class="go-title">天命崩解</h1>
             <div id="go-reason-text" class="go-reason">權力失衡，江山易主</div>
             <div class="go-desc-box">
-                <p id="go-summary-text">大華歷史至此發生偏折。聖上在位期間未能調和朝堂文武，天命旁落，留下了無盡的歷史遺憾...</p>
+                <p id="go-summary-text">大華歷史至此發生偏折...</p>
             </div>
             <button class="royal-btn" onclick="restartGame()">重新登基</button>
         </div>
@@ -464,7 +486,7 @@
         let eventPool = [];
         let currentEvent = null;
 
-        // 利用 Web Audio API 免外部文件生成玉璽重音與點擊反饋
+        // 音效生成器
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(isSeal) {
             try {
@@ -472,21 +494,21 @@
                 let gain = audioCtx.createGain();
                 if (isSeal) {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(95, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.35);
-                    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(90, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(25, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 } else {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(750, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
                 }
                 gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             } catch(e) {}
         }
 
-        // 加載畫面進度模擬
+        // 模擬進度條加載
         window.addEventListener('DOMContentLoaded', () => {
             let fill = document.getElementById('loader-fill');
             let msg = document.getElementById('loader-msg');
@@ -495,45 +517,45 @@
             
             let timer = setInterval(() => {
                 progress += 2;
-                fill.style.width = progress + '%';
-                if(progress === 30) msg.innerText = txts[1];
-                if(progress === 65) msg.innerText = txts[2];
-                if(progress === 90) msg.innerText = txts[3];
+                if (fill) fill.style.width = progress + '%';
+                if(progress === 25 && msg) msg.innerText = txts[1];
+                if(progress === 60 && msg) msg.innerText = txts[2];
+                if(progress === 85 && msg) msg.innerText = txts[3];
                 if(progress >= 100) {
                     clearInterval(timer);
                     document.getElementById('loading-panel').classList.add('hidden');
                     document.getElementById('menu-panel').classList.remove('hidden');
                 }
-            }, 25);
+            }, 20);
         });
 
-        // 核心 3 選項歷史事件池
+        // 歷史隨機事件資料庫
         const baseEvents = [
             {
                 title: "匈奴突襲寇邊",
                 desc: "邊關十萬火急！北面匈奴趁大寒南下狂飆掠奪，已連破我朝九邊兩處哨口，守軍告急！",
                 choices: [
-                    { txt: "「割地和親、增修互市，遣使修好以文德懷遠。」", effect: { pol: 15, eco: -15, mil: -10, cul: 15 }, log: "聖上決定增開互市懷柔北疆，文官讚譽仁德，但邊防愈發虛弱。" },
+                    { txt: "「割地和親、增修互市，遣使修好以文德懷遠。」", effect: { pol: 15, eco: -15, mil: -10, cul: 15 }, log: "增開互市懷柔北疆，文官讚譽天子仁德，但邊防武備日漸削弱。" },
                     { txt: "「暫緩出兵，徵調邊郡富商承包鹽利以籌集防禦加固軍費。」", effect: { pol: -5, eco: 20, mil: 5, cul: -5 }, log: "戶部通過讓利商賈籌集了防禦銀兩，暫時穩固政局但民生微怨。" },
-                    { txt: "「發兵迎擊！點將十萬迎戰，大破匈奴以正國威！」", effect: { pol: -10, eco: -25, mil: 25, cul: -5 }, log: "天子出兵！大將軍親率精騎北伐大勝，武備大振，但國庫開支甚巨。" }
+                    { txt: "「發兵迎擊！點將十萬迎戰，大破匈奴以正國威！」", effect: { pol: -10, eco: -25, mil: 25, cul: -5 }, log: "大將軍親率精騎北伐大勝匈奴，武備大振，但國庫開支甚巨。" }
                 ]
             },
             {
                 title: "黃河突發大決堤",
                 desc: "山東遭遇連日罕見暴雨，黃河數處長堤同時崩塌決口，數十萬流民無家可歸，賑災刻不容緩。",
                 choices: [
-                    { txt: "「派翰林儒生開倉放糧、安撫難民，倡導仁政慈悲。」", effect: { pol: 15, eco: -15, mil: 0, cul: 15 }, log: "儒生全面介入發放公糧，災區民心大定，朝野稱頌聖上聖德。" },
-                    { txt: "「允許地方豪強承包河道修築，賜予鬻爵免稅權換取賑災現銀。」", effect: { pol: -10, eco: 25, mil: -5, cul: -5 }, log: "通過售賣名譽官職迅速籌得巨資，國庫充盈，但損害了考課法度。" },
-                    { txt: "「出動地方守備軍強力封鎖災區，徵用壯丁強行修堤，彈壓騷亂。」", effect: { pol: -5, eco: -5, mil: 20, cul: -10 }, log: "守備軍實施鐵腕管制與強制修堤，雖然效率極高，但朝堂氣氛壓抑。" }
+                    { txt: "「派翰林儒生開倉放糧、安撫難民，倡導仁政慈悲。」", effect: { pol: 15, eco: -15, mil: 0, cul: 15 }, log: "儒生介入全面發放公糧，災區民心大定，朝野稱頌聖上聖德。" },
+                    { txt: "0「允許地方豪強承包河道修築，賜予鬻爵免稅權換取賑災現銀。」", effect: { pol: -10, eco: 25, mil: -5, cul: -5 }, log: "通過售賣官爵迅速籌得巨資，國庫充盈，但損害了吏部考課法度。" },
+                    { txt: "「出動地方守備軍強力封鎖災區，徵用壯丁強行修堤，彈壓騷亂。」", effect: { pol: -5, eco: -5, mil: 20, cul: -10 }, log: "守備軍實施鐵腕管制與強制修堤，雖然效率極高，但引發底層不滿。" }
                 ]
             },
             {
                 title: "江南科場舞弊案",
                 desc: "江南鄉試爆出驚天醜聞，主考官涉嫌收受鹽商巨額賄賂，向特定豪門子弟洩漏試題。",
                 choices: [
-                    { txt: "「由禮部重新開科，重申儒家公正，洗刷讀書人恥辱。」", effect: { pol: 20, eco: -5, mil: 0, cul: 15 }, log: "重新開科維護了仕子公正，文人學子無不感激涕零，天下文風大盛。" },
-                    { txt: "「將涉案豪商處以巨額罰銀，沒收財產入國庫，涉案官員降職。」", effect: { pol: -10, eco: 30, mil: -5, cul: -10 }, log: "聖上沒收貪墨資產，國庫瞬間爆滿，但科舉威信下降引發士林不滿。" },
-                    { txt: "「此乃動搖國本！著兵部與特務機構介入，通通滿門抄斬。」", effect: { pol: 10, eco: -5, mil: 20, cul: -15 }, log: "雷霆手段！武將和特務全面血洗江南官場，殺一儆百，軍威震懾朝廷。" }
+                    { txt: "「由禮部重新開科，重申儒家公正，洗刷讀書人處境。」", effect: { pol: 20, eco: -5, mil: 0, cul: 15 }, log: "重新開科維護了仕子公正，天下文風大盛，文臣高呼萬歲。" },
+                    { txt: "「將涉案豪商處以巨額罰銀，沒收財產入國庫，涉案官員降職。」", effect: { pol: -10, eco: 30, mil: -5, cul: -10 }, log: "沒收貪墨資產，國庫瞬間爆滿，但科舉威信下降引發士林議論。" },
+                    { txt: "「此乃動搖國本！著兵部與特務機構介入，通通滿門抄斬。」", effect: { pol: 10, eco: -5, mil: 20, cul: -15 }, log: "武將和特務全面血洗江南官場，殺一儆百，軍威雷霆震懾朝廷。" }
                 ]
             }
         ];
@@ -555,7 +577,7 @@
             keys.forEach(k => {
                 document.getElementById(`val-${k}`).innerText = stats[k];
                 document.getElementById(`bar-${k}`).style.width = stats[k] + '%';
-                // 臨界預警顏色變更
+                // 當數值低於 20% 時血條會自動變紅預警
                 document.getElementById(`bar-${k}`).style.background = stats[k] <= 20 ? 
                     "linear-gradient(90deg, #ff0000, #8b0000)" : "linear-gradient(90deg, #8b0000, #d4af37)";
             });
@@ -574,32 +596,30 @@
             document.getElementById('current-event-title').innerText = `當前朝政大政 · ${currentEvent.title}`;
             document.getElementById('current-event-desc').innerText = currentEvent.desc;
 
-            // 渲染 3 選項至實體奏折中
             document.getElementById('prop-civil').innerText = currentEvent.choices[0].txt;
             document.getElementById('prop-eco').innerText = currentEvent.choices[1].txt;
             document.getElementById('prop-military').innerText = currentEvent.choices[2].txt;
         }
 
         function makeChoice(index) {
-            // 觸發物理蓋章打擊感與視窗震動
             playSound(true);
             const stage = document.getElementById('game-stage');
             stage.classList.add('shake-active');
-            setTimeout(() => stage.classList.remove('shake-active'), 350);
+            setTimeout(() => stage.classList.remove('shake-active'), 300);
 
             let choice = currentEvent.choices[index];
             for(let key in choice.effect) {
                 stats[key] = Math.max(0, Math.min(100, stats[key] + choice.effect[key]));
             }
 
-            // 更新宣紙歷史日誌
+            // 更新宣紙編年史日誌
             document.getElementById('history-bar-log').innerHTML = `<i class="fa-solid fa-pen-nib"></i> 宣德${convertToChineseYear(currentTurn)}年：${choice.log}`;
             updateHUD();
 
             if (checkGameOver()) return;
 
             currentTurn++;
-            setTimeout(nextEvent, 500); // 留白半秒，讓玩家看清國力條滑動增減
+            setTimeout(nextEvent, 400);
         }
 
         function checkGameOver() {
@@ -622,7 +642,6 @@
                 sum = "帝國一味推行商業壓榨或鐵腕軍事清洗，導致天下斯文掃地、禮崩樂壞。朝廷喪失了合法性，各地宗室紛紛打著清君側旗號舉兵，天下大亂。";
                 dead = true;
             } else if (currentTurn >= 10) {
-                // 通關成功條件
                 document.getElementById('game-panel').classList.add('hidden');
                 document.getElementById('gameover-panel').classList.remove('hidden');
                 document.getElementById('go-title-text').innerText = "✨ 天命最高 ✨";
